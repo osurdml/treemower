@@ -3,22 +3,18 @@ OUTPUT=treemower
 OUTPUT_DIR=.
 
 # Source Files
-SOURCES = main.cpp
+SOURCES = main.cpp decisiontree.cpp
 SRCDIR = src
+INCLUDE_DIRS = include
+OBJDIR = build
 
 # Define programs
 CC = clang++
 
 # Compiler flags
-CFLAGS  = -O$(OPT)
+CFLAGS  = -O2
 CFLAGS += -Wall
 CFLAGS += $(patsubst %,-I%,$(INCLUDE_DIRS))
-CFLAGS += -lm
-
-# Build Options
-OBJDIR = build
-INCLUDE_DIRS = include
-OPT = 2
 
 # Define object files
 OBJS = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SOURCES))
