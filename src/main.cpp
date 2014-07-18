@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 {
 	printf("Running Treemower.\n");
 
-	DecisionTree dt(2);
+	DecisionTree dt(4);
 
 	printf("Tree score: %ld\n", dt.MowTrees());
 	printf("Lawn score: %ld\n", dt.MowLawn());

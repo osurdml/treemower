@@ -6,17 +6,18 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/directed_graph.hpp>
 
+typedef boost::adjacency_list<boost::setS, boost::setS>::vertex_descriptor vx_t;
+
 struct vx_property {
-	boost::adjacency_list<>::vertex_descriptor parent;
+	vx_t parent;
 	long score;
 };
 
 struct edge_property {
 };
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, vx_property, edge_property> Graph;
+typedef boost::adjacency_list<boost::setS, boost::setS, boost::directedS, vx_property, edge_property> Graph;
 
-typedef Graph::vertex_descriptor vx_t;
 
 class DecisionTree {
 	int num_lookahead;
@@ -41,7 +42,8 @@ class DecisionTree {
 	// Outer vertices. TODO(yoos): list probably isn't the best type to use here.
 	std::list<vx_t> outer;
 
-	void PruneRecursive(vx_t v);
+	void PruneRecursive(vx_t v, int);
+	void print_debug(void);
 	// vx_t BreakTie(vector<vx_t> v);
 
 public:
