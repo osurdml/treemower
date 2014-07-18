@@ -5,9 +5,9 @@
 
 int main(int argc, char **argv)
 {
-	printf("Running Treemower.\n");
+	std::cout << "Running Treemower." << std::endl;
 
-	DecisionTree dt(4);
+	DecisionTree dt(10);
 
 	printf("Tree score: %ld\n", dt.MowTrees());
 	printf("Lawn score: %ld\n", dt.MowLawn());

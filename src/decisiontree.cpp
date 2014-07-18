@@ -14,13 +14,12 @@ void DecisionTree::PruneRecursive(vx_t from_vx, int rec_depth)
 	char indent[rec_depth*2];
 	for (int i=0; i<rec_depth*2; i++) sprintf(indent+i, " ");
 
-	std::cout << indent << "Pruning vertex " << from_vx << " with " << boost::out_degree(from_vx, g) << " descendants" << std::endl;
 
 	// Recurse on any descendant vertices and edges.
 	if (boost::out_degree(from_vx, g) > 0) {
+		//std::cout << indent << "Pruning vertex " << from_vx << " with " << boost::out_degree(from_vx, g) << " descendants" << std::endl;
 		typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 		std::pair<edge_iter, edge_iter> edges = boost::out_edges(from_vx, g);
-		std::cout << indent << *edges.first << " " << *edges.second << std::endl;
 
 		// Create removal list. If we iterate over the edge iterator while
 		// removing edges, unhappy things happen.
@@ -35,14 +34,13 @@ void DecisionTree::PruneRecursive(vx_t from_vx, int rec_depth)
 			DecisionTree::PruneRecursive(target_vx, rec_depth+1);
 			if (target_vx != best_ancestor_vx) {
 				// Remove target vertex and edge (edge first!)
-				std::cout << indent << "Removing " << *it << std::endl;
-				//boost::remove_edge(*it, g);   // TODO(yoos): Is this faster?
-				boost::clear_vertex(target_vx, g);
+				//std::cout << indent << "Removing " << *it << std::endl;
+				boost::remove_edge(*it, g);
 				boost::remove_vertex(target_vx, g);
 			}
-			else {
-				std::cout << indent << "Not removing " << *it << std::endl;
-			}
+			//else {
+			//	std::cout << indent << "Not removing " << *it << std::endl;
+			//}
 		}
 	}
 }
@@ -85,15 +83,14 @@ long DecisionTree::MowTrees(void)
 					g[v_next].parent = outer.front();
 					g[v_next].score = j+k;
 					outer.push_back(v_next);
-					std::cout << "Created " << v_next << std::endl;
 				}
 
 				// Remove parent
 				outer.pop_front();
 			}
-			printf("%lu outer vertices to process after step %d\n", outer.size(), i+1);
+			//printf("%lu outer vertices to process after step %d\n", outer.size(), i+1);
 		}
-		printf("Done looking ahead %d steps.\n", num_lookahead);
+		//printf("Done looking ahead %d steps.\n", num_lookahead);
 
 		// Find the best end vertex.
 		vx_t best_vx = outer.front();
@@ -115,10 +112,12 @@ long DecisionTree::MowTrees(void)
 		current_vx = best_ancestor_vx;
 		outer.clear();
 		outer.push_back(current_vx);
-		print_debug();
 
 		score += g[current_vx].score;
 	}
+
+	std::cout << std::endl;
+	print_debug();
 
 	// Return number of free outer vertices.
 	return score;
