@@ -6,20 +6,19 @@ DecisionTree::DecisionTree(int num_lookahead)
 
 	vx_t v_start = boost::add_vertex(g);
 	current_vx = v_start;
-	outer.push_back(current_vx);
+	frontier.push_back(current_vx);
 }
 
-void DecisionTree::PruneRecursive(vx_t from_vx, int rec_depth)
+void DecisionTree::PruneRecursive(vx_t source_vx, int rec_depth)
 {
 	char indent[rec_depth*2];
 	for (int i=0; i<rec_depth*2; i++) sprintf(indent+i, " ");
 
 
 	// Recurse on any descendant vertices and edges.
-	if (boost::out_degree(from_vx, g) > 0) {
-		//std::cout << indent << "Pruning vertex " << from_vx << " with " << boost::out_degree(from_vx, g) << " descendants" << std::endl;
-		typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
-		std::pair<edge_iter, edge_iter> edges = boost::out_edges(from_vx, g);
+	if (boost::out_degree(source_vx, g) > 0) {
+		//std::cout << indent << "Pruning vertex " << source_vx << " with " << boost::out_degree(source_vx, g) << " descendants" << std::endl;
+		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, g);
 
 		// Create removal list. If we iterate over the edge iterator while
 		// removing edges, unhappy things happen.
@@ -66,35 +65,35 @@ long DecisionTree::MowTrees(void)
 	long score = 0;
 	int inc = 0;
 
-	// Loop until outer is empty.
+	// Loop until frontier is empty.
 	while (inc != 4) {
 		inc++;
 		std::cout << "Current: " << current_vx << std::endl;
 		for (int i=0; i<num_lookahead; i++) {
-			long iter_num = outer.size();
-			// Iterate over outer vertices.
+			long iter_num = frontier.size();
+			// Iterate over frontier vertices.
 			for (long j=0; j<iter_num; j++) {
 				// Generate branches
 				// TODO(yoos): Generate sensible vertices from costmap.
 				int num_branches = 3;
 				for (int k=0; k<num_branches; k++) {
 					vx_t v_next = boost::add_vertex(g);
-					boost::add_edge(outer.front(), v_next, g);
-					g[v_next].parent = outer.front();
+					boost::add_edge(frontier.front(), v_next, g);
+					g[v_next].parent = frontier.front();
 					g[v_next].score = j+k;
-					outer.push_back(v_next);
+					frontier.push_back(v_next);
 				}
 
-				// Remove parent
-				outer.pop_front();
+				// Remove parent from frontier list.
+				frontier.pop_front();
 			}
-			//printf("%lu outer vertices to process after step %d\n", outer.size(), i+1);
+			//printf("%lu frontier vertices to process after step %d\n", frontier.size(), i+1);
 		}
 		//printf("Done looking ahead %d steps.\n", num_lookahead);
 
 		// Find the best end vertex.
-		vx_t best_vx = outer.front();
-		for (std::list<vx_t>::iterator it=outer.begin(); it!=outer.end(); ++it) {
+		vx_t best_vx = frontier.front();
+		for (std::list<vx_t>::iterator it=frontier.begin(); it!=frontier.end(); ++it) {
 			if (g[*it].score > g[best_vx].score) {
 				best_vx = *it;
 			}
@@ -110,8 +109,8 @@ long DecisionTree::MowTrees(void)
 
 		DecisionTree::PruneRecursive(current_vx, 0);
 		current_vx = best_ancestor_vx;
-		outer.clear();
-		outer.push_back(current_vx);
+		frontier.clear();
+		frontier.push_back(current_vx);
 
 		score += g[current_vx].score;
 	}
@@ -119,7 +118,7 @@ long DecisionTree::MowTrees(void)
 	std::cout << std::endl;
 	print_debug();
 
-	// Return number of free outer vertices.
+	// Return number of free frontier vertices.
 	return score;
 }
 

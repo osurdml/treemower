@@ -17,6 +17,7 @@ struct edge_property {
 };
 
 typedef boost::adjacency_list<boost::setS, boost::setS, boost::directedS, vx_property, edge_property> Graph;
+typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 
 
 class DecisionTree {
@@ -39,8 +40,8 @@ class DecisionTree {
 	vx_t current_vx;   // Current vertex.
 	vx_t best_ancestor_vx;   // For processing.
 
-	// Outer vertices. TODO(yoos): list probably isn't the best type to use here.
-	std::list<vx_t> outer;
+	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
+	std::list<vx_t> frontier;
 
 	void PruneRecursive(vx_t v, int);
 	void print_debug(void);
