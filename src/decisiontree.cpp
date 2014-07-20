@@ -1,6 +1,6 @@
 #include <decisiontree.hpp>
 
-DecisionTree::DecisionTree(int num_lookahead)
+DecisionTree::DecisionTree(CostMap cm, int num_lookahead)
 {
 	this->num_lookahead = num_lookahead;
 

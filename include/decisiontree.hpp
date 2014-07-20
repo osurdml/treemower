@@ -6,6 +6,8 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/directed_graph.hpp>
 
+#include <costmap.hpp>
+
 typedef boost::adjacency_list<boost::setS, boost::setS>::vertex_descriptor vx_t;
 
 struct vx_property {
@@ -48,7 +50,7 @@ class DecisionTree {
 	// vx_t BreakTie(vector<vx_t> v);
 
 public:
-	DecisionTree(int num_lookahead);
+	DecisionTree(CostMap cm, int num_lookahead);
 
 	// Mow the trees. Return the score.
 	long MowTrees(void);

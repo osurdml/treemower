@@ -23,10 +23,10 @@ int main(int argc, char **argv)
 		std::cerr << "Failed to open file " << cmfilename << std::endl;
 		return 1;
 	}
-	CostMap(&cmfile, 100, 100);
+	CostMap cm(&cmfile, 100, 100);
 	cmfile.close();
 
-	DecisionTree dt(10);
+	DecisionTree dt(cm, 10);
 
 	printf("Tree score: %ld\n", dt.MowTrees());
 	printf("Lawn score: %ld\n", dt.MowLawn());
