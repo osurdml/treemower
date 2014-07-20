@@ -3,9 +3,9 @@ OUTPUT=treemower
 OUTPUT_DIR=.
 
 # Source Files
-SOURCES = main.cpp decisiontree.cpp
+SOURCES = main.cpp costmap.cpp decisiontree.cpp
 SRCDIR = src
-INCLUDE_DIRS = include
+INCLUDE_DIRS = include /usr/include/eigen3
 OBJDIR = build
 
 # Define programs
