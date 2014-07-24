@@ -5,6 +5,7 @@
 
 #include <costmap.hpp>
 #include <decisiontree.hpp>
+#include <stuntzhuntz.hpp>
 
 int main(int argc, char **argv)
 {
@@ -26,10 +27,11 @@ int main(int argc, char **argv)
 	CostMap cm(&cmfile, 100, 100);
 	cmfile.close();
 
-	DecisionTree dt(cm, 10);
+	StuntzHuntz sh(&cm);
+	DecisionTree lawn_dt(10, sh.update);
+	// TODO: tree_dt
 
-	printf("Tree score: %ld\n", dt.MowTrees());
-	printf("Lawn score: %ld\n", dt.MowLawn());
+	printf("Lawn score: %ld\n", lawn_dt.Mow());
 
 	return 0;
 }

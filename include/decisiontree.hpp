@@ -1,18 +1,20 @@
 #ifndef DECISIONTREE_HPP
 #define DECISIONTREE_HPP
 
+#include <stuntzhuntz.hpp>
+
 #include <stdio.h>
+#include <vector>
+#include <list>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/directed_graph.hpp>
-
-#include <costmap.hpp>
 
 typedef boost::adjacency_list<boost::setS, boost::setS>::vertex_descriptor vx_t;
 
 struct vx_property {
 	vx_t parent;
-	long score;
+	decision_t decision;
 };
 
 struct edge_property {
@@ -45,18 +47,16 @@ class DecisionTree {
 	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
 	std::list<vx_t> frontier;
 
+	int (*update)(std::vector<decision_t> decisions);
 	void PruneRecursive(vx_t v, int);
 	void print_debug(void);
 	// vx_t BreakTie(vector<vx_t> v);
 
 public:
-	DecisionTree(CostMap cm, int num_lookahead);
+	DecisionTree(int num_lookahead, int (*update_fp)(std::vector<decision_t>));
 
 	// Mow the trees. Return the score.
-	long MowTrees(void);
-
-	// Mow the lawn. Return the score.
-	long MowLawn(void);
+	long Mow(void);
 };
 
 #endif // DECISIONTREE_HPP

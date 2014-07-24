@@ -1,8 +1,10 @@
 #include <decisiontree.hpp>
+#include <stuntzhuntz.hpp>
 
-DecisionTree::DecisionTree(CostMap cm, int num_lookahead)
+DecisionTree::DecisionTree(int num_lookahead, int (*update_fp)(std::vector<decision_t>))
 {
 	this->num_lookahead = num_lookahead;
+	update = update_fp;
 
 	vx_t v_start = boost::add_vertex(g);
 	current_vx = v_start;
@@ -60,28 +62,30 @@ void DecisionTree::print_debug(void)
 	std::cout << std::endl;
 }
 
-long DecisionTree::MowTrees(void)
+long DecisionTree::Mow(void)
 {
+	// Reset
 	long score = 0;
-	int inc = 0;
+	frontier.clear();
 
 	// Loop until frontier is empty.
-	while (inc != 4) {
-		inc++;
-		std::cout << "Current: " << current_vx << std::endl;
+	while (frontier.size() > 0) {
 		for (int i=0; i<num_lookahead; i++) {
-			long iter_num = frontier.size();
+
 			// Iterate over frontier vertices.
-			for (long j=0; j<iter_num; j++) {
-				// Generate branches
-				// TODO(yoos): Generate sensible vertices from costmap.
-				int num_branches = 3;
-				for (int k=0; k<num_branches; k++) {
-					vx_t v_next = boost::add_vertex(g);
-					boost::add_edge(frontier.front(), v_next, g);
-					g[v_next].parent = frontier.front();
-					g[v_next].score = j+k;
-					frontier.push_back(v_next);
+			long frontier_size = frontier.size();
+			for (long j=0; j<frontier_size; j++) {
+				// Get decisions from algorithm.
+				std::vector<decision_t> decisions;
+				update(decisions);
+
+				// Add all decisions.
+				for (std::vector<decision_t>::iterator it=decisions.begin(); it!=decisions.end(); it++) {
+					vx_t v_new = boost::add_vertex(g);
+					boost::add_edge(frontier.front(), v_new, g);
+					g[v_new].parent = frontier.front();
+					g[v_new].decision = *it;
+					frontier.push_back(v_new);
 				}
 
 				// Remove parent from frontier list.
@@ -94,11 +98,11 @@ long DecisionTree::MowTrees(void)
 		// Find the best end vertex.
 		vx_t best_vx = frontier.front();
 		for (std::list<vx_t>::iterator it=frontier.begin(); it!=frontier.end(); ++it) {
-			if (g[*it].score > g[best_vx].score) {
+			if (g[*it].decision.score > g[best_vx].decision.score) {
 				best_vx = *it;
 			}
 		}
-		std::cout << "Best score found: " << g[best_vx].score << " at " << best_vx << std::endl;
+		std::cout << "Best score found: " << g[best_vx].decision.score << " at " << best_vx << std::endl;
 
 		// Step into best branch and prune the rest.
 		best_ancestor_vx = best_vx;
@@ -112,20 +116,13 @@ long DecisionTree::MowTrees(void)
 		frontier.clear();
 		frontier.push_back(current_vx);
 
-		score += g[current_vx].score;
+		score += g[current_vx].decision.score;
 	}
 
 	std::cout << std::endl;
 	print_debug();
 
 	// Return number of free frontier vertices.
-	return score;
-}
-
-long DecisionTree::MowLawn(void)
-{
-	long score = 0;
-
 	return score;
 }
 
