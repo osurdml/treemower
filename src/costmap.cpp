@@ -18,5 +18,13 @@ CostMap::CostMap(std::ifstream *cm, long rows, long cols)
 	}
 }
 
+std::pair<long, long> CostMap::getSize(void)
+{
+	return std::pair<long, long> (100, 100); // TODO
+}
 
+long CostMap::getScore(long x, long y)
+{
+	return m(x, y);
+}
 

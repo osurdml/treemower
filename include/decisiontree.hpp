@@ -9,6 +9,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/directed_graph.hpp>
+#include <boost/function.hpp>
 
 typedef boost::adjacency_list<boost::setS, boost::setS>::vertex_descriptor vx_t;
 
@@ -47,15 +48,38 @@ class DecisionTree {
 	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
 	std::list<vx_t> frontier;
 
-	int (*update)(std::vector<decision_t> decisions);
+	//int (*update)(std::vector<decision_t> decisions);
+
+	/**
+	 * @brief Frontier generator.
+	 */
+	boost::function<int (decision_t, std::vector<decision_t>)> *update;
+
+	/**
+	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
+	 */
 	void PruneRecursive(vx_t v, int);
+
+	/**
+	 * @brief Debug
+	 */
 	void print_debug(void);
 	// vx_t BreakTie(vector<vx_t> v);
 
 public:
-	DecisionTree(int num_lookahead, int (*update_fp)(std::vector<decision_t>));
+	/**
+	 * @brief Constructor.
+	 *
+	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
+	 * @param update_fn Function called at every step to generate new frontier.
+	 */
+	DecisionTree(int num_lookahead, boost::function<int (decision_t, std::vector<decision_t>)> *update_fn);
 
-	// Mow the trees. Return the score.
+	/**
+	 * @brief Runs treemower.
+	 *
+	 * @return The score
+	 */
 	long Mow(void);
 };
 
