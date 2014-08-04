@@ -1,7 +1,7 @@
 #ifndef DECISIONTREE_HPP
 #define DECISIONTREE_HPP
 
-#include <stuntzhuntz.hpp>
+#include <costmap.hpp>
 
 #include <stdio.h>
 #include <vector>
@@ -12,6 +12,12 @@
 #include <boost/function.hpp>
 
 typedef boost::adjacency_list<boost::setS, boost::setS>::vertex_descriptor vx_t;
+
+struct decision_t {
+	location_t loc;
+	float score;
+	float depth;
+};
 
 struct vx_property {
 	vx_t parent;
@@ -24,6 +30,15 @@ struct edge_property {
 typedef boost::adjacency_list<boost::setS, boost::setS, boost::directedS, vx_property, edge_property> Graph;
 typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 
+
+class FrontierGenerator {
+protected:
+	CostMap *cm;
+
+public:
+	FrontierGenerator(CostMap *cm);
+	boost::function<int (decision_t state, std::vector<decision_t> decisions)> update;
+};
 
 class DecisionTree {
 	int num_lookahead;
@@ -53,7 +68,7 @@ class DecisionTree {
 	/**
 	 * @brief Frontier generator.
 	 */
-	boost::function<int (decision_t, std::vector<decision_t>)> *update;
+	FrontierGenerator *fg;
 
 	/**
 	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
@@ -71,9 +86,9 @@ public:
 	 * @brief Constructor.
 	 *
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
-	 * @param update_fn Function called at every step to generate new frontier.
+	 * @param fg Instance of a FrontierGenerator whose update function we will call.
 	 */
-	DecisionTree(int num_lookahead, boost::function<int (decision_t, std::vector<decision_t>)> *update_fn);
+	DecisionTree(int num_lookahead, FrontierGenerator *fg);
 
 	/**
 	 * @brief Runs treemower.

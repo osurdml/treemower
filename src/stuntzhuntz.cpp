@@ -4,10 +4,10 @@
 
 #include <boost/bind.hpp>
 
-StuntzHuntz::StuntzHuntz(CostMap *cm) :
-	update(boost::bind(&StuntzHuntz::_LawnStart, this, _1, _2))
+StuntzHuntz::StuntzHuntz(CostMap *cm)
 {
 	this->cm = cm;
+	update = boost::bind(&StuntzHuntz::_LawnStart, this, _1, _2);
 }
 
 void StuntzHuntz::AddDecision(std::vector<decision_t> decisions, long x, long y, float score)

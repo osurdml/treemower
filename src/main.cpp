@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 	cmfile.close();
 
 	StuntzHuntz sh(&cm);
-	DecisionTree lawn_dt(10, &sh.update);
+	DecisionTree lawn_dt(10, &sh);
 	// TODO: tree_dt
 
 	printf("Lawn score: %ld\n", lawn_dt.Mow());
