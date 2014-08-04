@@ -50,6 +50,8 @@ class DecisionTree {
 
 	//typedef int (StuntzHuntz::*update_t)(decision_t state, std::vector<decision_t> decisions);
 	//update_t dt_update;
+	
+	boost::function<int (decision_t, std::vector<decision_t> states)> myfunc;
 
 	/**
 	 * @brief Frontier generator.

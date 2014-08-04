@@ -8,6 +8,8 @@ DecisionTree::DecisionTree(int num_lookahead, StuntzHuntz *sh_p)
 	//dt_update = update_p;
 	sh = sh_p;
 
+	myfunc = sh_p->update;
+
 	vx_t v_start = boost::add_vertex(g);
 	current_vx = v_start;
 	frontier.push_back(current_vx);

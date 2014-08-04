@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 struct decision_t {
 	location_t loc;
@@ -26,8 +27,9 @@ class StuntzHuntz {
 
 public:
 	StuntzHuntz(CostMap *cm_p);
-	//boost::function<int (decision_t state, std::vector<decision_t> decisions)> update;
-	int (StuntzHuntz::*update)(decision_t state, std::vector<decision_t> decisions);
+
+	boost::function<int (decision_t state, std::vector<decision_t> decisions)> update;
+	// int (StuntzHuntz::*update)(decision_t state, std::vector<decision_t> decisions);
 
 };
 

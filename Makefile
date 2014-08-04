@@ -14,6 +14,7 @@ CC = clang++
 # Compiler flags
 CFLAGS  = -O2
 CFLAGS += -Wall
+CFLAGS += -g
 CFLAGS += $(patsubst %,-I%,$(INCLUDE_DIRS))
 
 # Define object files
