@@ -24,10 +24,10 @@ int main(int argc, char **argv)
 		std::cerr << "Failed to open file " << cmfilename << std::endl;
 		return 1;
 	}
-	CostMap cm(&cmfile, 100, 100);
+	CostMap cm_input(&cmfile, 100, 100);
 	cmfile.close();
 
-	StuntzHuntz sh(&cm);
+	StuntzHuntz sh(&cm_input);
 	DecisionTree lawn_dt(10, &sh);
 	// TODO: tree_dt
 

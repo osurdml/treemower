@@ -2,10 +2,11 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(int num_lookahead, FrontierGenerator *fg)
+DecisionTree::DecisionTree(int num_lookahead, StuntzHuntz *sh_p)
 {
 	this->num_lookahead = num_lookahead;
-	this->fg = fg;
+	//dt_update = update_p;
+	sh = sh_p;
 
 	vx_t v_start = boost::add_vertex(g);
 	current_vx = v_start;
@@ -78,7 +79,7 @@ long DecisionTree::Mow(void)
 			for (long j=0; j<frontier_size; j++) {
 				// Get decisions from algorithm.
 				std::vector<decision_t> decisions;
-				fg->update(g[frontier.front()].decision, decisions);
+				sh->update(g[frontier.front()].decision, decisions);
 
 				// Add all decisions.
 				for (std::vector<decision_t>::iterator it=decisions.begin(); it!=decisions.end(); it++) {

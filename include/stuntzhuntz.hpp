@@ -2,14 +2,20 @@
 #define STUNTZHUNTZ_HPP
 
 #include <costmap.hpp>
-#include <decisiontree.hpp>
 
 #include <stdlib.h>
 #include <vector>
 #include <boost/function.hpp>
 
+struct decision_t {
+	location_t loc;
+	float score;
+	float depth;
+};
 
-class StuntzHuntz : protected FrontierGenerator {
+class StuntzHuntz {
+	CostMap *cm;
+
 	void AddDecision(std::vector<decision_t> decisions, long x, long y, float score);
 
 	int _LawnStart (decision_t state, std::vector<decision_t> decisions);
@@ -19,7 +25,10 @@ class StuntzHuntz : protected FrontierGenerator {
 	int _LawnEnd   (decision_t state, std::vector<decision_t> decisions);
 
 public:
-	StuntzHuntz(CostMap *cm);
+	StuntzHuntz(CostMap *cm_p);
+	//boost::function<int (decision_t state, std::vector<decision_t> decisions)> update;
+	int (StuntzHuntz::*update)(decision_t state, std::vector<decision_t> decisions);
+
 };
 
 #endif // STUNTZHUNTZ_HPP
