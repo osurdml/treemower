@@ -2,13 +2,12 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(int num_lookahead, StuntzHuntz *sh_p)
+DecisionTree::DecisionTree(int num_lookahead, update_t *update_f)
 {
 	this->num_lookahead = num_lookahead;
 	//dt_update = update_p;
-	sh = sh_p;
 
-	myfunc = sh_p->update;
+	update = update_f;
 
 	vx_t v_start = boost::add_vertex(g);
 	current_vx = v_start;
@@ -56,12 +55,13 @@ void DecisionTree::print_debug(void)
 	std::cout << "Graph contains " << boost::num_edges(g) << " edges, " << boost::num_vertices(g) << " vertices." << std::endl;
 
 	// Print path
-	std::cout << "Path so far: ";
+	std::cout << "Path so far:\n";
 	vx_t print_vx = current_vx;
-	std::cout << print_vx;
+	location_t loc = g[current_vx].decision.loc;
 	while (g[print_vx].parent != 0) {
+		std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";
 		print_vx = g[print_vx].parent;
-		std::cout << " -- " << print_vx;
+		loc = g[print_vx].decision.loc;
 	}
 	std::cout << std::endl;
 }
@@ -70,10 +70,11 @@ long DecisionTree::Mow(void)
 {
 	// Reset
 	long score = 0;
-	frontier.clear();
 
 	// Loop until frontier is empty.
-	do {
+	//while (frontier.size() > 0) {
+	int arst;
+	for (arst=0; arst<200; arst++) {
 		for (int i=0; i<num_lookahead; i++) {
 
 			// Iterate over frontier vertices.
@@ -81,7 +82,7 @@ long DecisionTree::Mow(void)
 			for (long j=0; j<frontier_size; j++) {
 				// Get decisions from algorithm.
 				std::vector<decision_t> decisions;
-				sh->update(g[frontier.front()].decision, decisions);
+				(*update)(g[frontier.front()].decision, &decisions);
 
 				// Add all decisions.
 				for (std::vector<decision_t>::iterator it=decisions.begin(); it!=decisions.end(); it++) {
@@ -101,19 +102,20 @@ long DecisionTree::Mow(void)
 
 		// Find the best end vertex.
 		vx_t best_vx = frontier.front();
-		for (std::list<vx_t>::iterator it=frontier.begin(); it!=frontier.end(); ++it) {
+		//std::cout << "Frontier size: " << frontier.size() << std::endl;
+		for (std::list<vx_t>::iterator it=frontier.begin(); it!=frontier.end(); it++) {
 			if (g[*it].decision.score > g[best_vx].decision.score) {
 				best_vx = *it;
 			}
 		}
-		std::cout << "Best score found: " << g[best_vx].decision.score << " at " << best_vx << std::endl;
+		//std::cout << "Best score found: " << g[best_vx].decision.score << " at " << best_vx << std::endl;
 
 		// Step into best branch and prune the rest.
 		best_ancestor_vx = best_vx;
 		for (int i=0; i<num_lookahead-1; i++) {
 			best_ancestor_vx = g[best_ancestor_vx].parent;
 		}
-		std::cout << "Pruning all branches except " << best_ancestor_vx << std::endl;
+		//std::cout << "Pruning all branches except " << best_ancestor_vx << std::endl;
 
 		DecisionTree::PruneRecursive(current_vx, 0);
 		current_vx = best_ancestor_vx;
@@ -121,7 +123,7 @@ long DecisionTree::Mow(void)
 		frontier.push_back(current_vx);
 
 		score += g[current_vx].decision.score;
-	} while (frontier.size() > 0);
+	};
 
 	std::cout << std::endl;
 	print_debug();

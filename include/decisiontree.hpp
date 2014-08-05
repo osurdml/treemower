@@ -48,15 +48,10 @@ class DecisionTree {
 	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
 	std::list<vx_t> frontier;
 
-	//typedef int (StuntzHuntz::*update_t)(decision_t state, std::vector<decision_t> decisions);
-	//update_t dt_update;
-	
-	boost::function<int (decision_t, std::vector<decision_t> states)> myfunc;
-
 	/**
-	 * @brief Frontier generator.
+	 * @brief State machine update function.
 	 */
-	StuntzHuntz *sh;
+	update_t *update;
 
 	/**
 	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
@@ -76,7 +71,7 @@ public:
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
 	 * @param fg Instance of a FrontierGenerator whose update function we will call.
 	 */
-	DecisionTree(int num_lookahead, StuntzHuntz *sh_p);
+	DecisionTree(int num_lookahead, boost::function<int (decision_t, std::vector<decision_t>*)>*);
 
 	/**
 	 * @brief Runs treemower.
