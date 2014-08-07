@@ -51,7 +51,8 @@ class DecisionTree {
 	/**
 	 * @brief State machine update function.
 	 */
-	update_t *update;
+	state_t *update;
+	state_t *state;
 
 	/**
 	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
@@ -71,7 +72,7 @@ public:
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
 	 * @param fg Instance of a FrontierGenerator whose update function we will call.
 	 */
-	DecisionTree(int num_lookahead, boost::function<int (decision_t, std::vector<decision_t>*)>*);
+	DecisionTree(int num_lookahead, StuntzHuntz *sh);
 
 	/**
 	 * @brief Runs treemower.

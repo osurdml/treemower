@@ -6,6 +6,7 @@ StuntzHuntz::StuntzHuntz(CostMap *cm_p)
 {
 	cm = cm_p;
 	update = boost::bind(&StuntzHuntz::_LawnStart, this, _1, _2);
+	realState = update;
 }
 
 void StuntzHuntz::AddDecision(std::vector<decision_t> *decisions, long x, long y, float score)
@@ -19,6 +20,9 @@ void StuntzHuntz::AddDecision(std::vector<decision_t> *decisions, long x, long y
  * Lawnmower code
  *
  * Convoluted, yes. This is just so I can mess around with Boost a bit.
+ *
+ * Problem: this defines how we move between states, but the actual state is
+ * tracked by decisiontree. This is wrong.
  */
 
 int StuntzHuntz::_LawnStart(decision_t state, std::vector<decision_t> *decisions)

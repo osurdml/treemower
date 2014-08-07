@@ -2,12 +2,13 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(int num_lookahead, update_t *update_f)
+DecisionTree::DecisionTree(int num_lookahead, StuntzHuntz *sh)
 {
 	this->num_lookahead = num_lookahead;
 	//dt_update = update_p;
 
-	update = update_f;
+	update = &sh->update;
+	state = &sh->realState;
 
 	vx_t v_start = boost::add_vertex(g);
 	current_vx = v_start;
@@ -74,7 +75,7 @@ long DecisionTree::Mow(void)
 	// Loop until frontier is empty.
 	//while (frontier.size() > 0) {
 	int arst;
-	for (arst=0; arst<200; arst++) {
+	for (arst=0; arst<9950; arst++) {
 		for (int i=0; i<num_lookahead; i++) {
 
 			// Iterate over frontier vertices.
@@ -96,6 +97,10 @@ long DecisionTree::Mow(void)
 				// Remove parent from frontier list.
 				frontier.pop_front();
 			}
+
+			// HACK: Reset updater.
+			*update = *state;
+
 			//printf("%lu frontier vertices to process after step %d\n", frontier.size(), i+1);
 		}
 		//printf("Done looking ahead %d steps.\n", num_lookahead);
@@ -121,6 +126,11 @@ long DecisionTree::Mow(void)
 		current_vx = best_ancestor_vx;
 		frontier.clear();
 		frontier.push_back(current_vx);
+
+		// HACK: update real state.
+		std::vector<decision_t> decisions;
+		(*update)(g[current_vx].decision, &decisions);
+		*state = *update;
 
 		score += g[current_vx].decision.score;
 	};
