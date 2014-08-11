@@ -24,11 +24,11 @@ int main(int argc, char **argv)
 		std::cerr << "Failed to open file " << cmfilename << std::endl;
 		return 1;
 	}
-	CostMap cm_input(&cmfile, 100, 100);
+	CostMap cm_input(&cmfile, 3, 3);
 	cmfile.close();
 
 	StuntzHuntz sh(&cm_input);
-	DecisionTree lawn_dt(10, &sh);
+	DecisionTree lawn_dt(4, &sh);
 	// TODO: tree_dt
 
 	printf("Lawn score: %ld\n", lawn_dt.Mow());

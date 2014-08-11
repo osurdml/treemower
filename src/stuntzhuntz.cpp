@@ -2,90 +2,100 @@
 
 #include <stdio.h>
 
-StuntzHuntz::StuntzHuntz(CostMap *cm_p)
+StuntzHuntz::StuntzHuntz(CostMap *cm_p) :
+	_cm_la(cm_p),
+	_cm_tmp(cm_p)
+	//getActions(boost::bind(&StuntzHuntz::_LawnStart, this, _1, _2))
 {
 	cm = cm_p;
-	update = boost::bind(&StuntzHuntz::_LawnStart, this, _1, _2);
-	realState = update;
 }
 
-void StuntzHuntz::AddDecision(std::vector<decision_t> *decisions, long x, long y, float score)
+void StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score)
 {
-	decision_t d = {{x, y}, score, 0};
-	decisions->push_back(d);
+	state_t d = {{x, y}, score, 0};
+	states->push_back(d);
 }
 
-
-/**
- * Lawnmower code
- *
- * Convoluted, yes. This is just so I can mess around with Boost a bit.
- *
- * Problem: this defines how we move between states, but the actual state is
- * tracked by decisiontree. This is wrong.
- */
-
-int StuntzHuntz::_LawnStart(decision_t state, std::vector<decision_t> *decisions)
+void StuntzHuntz::cm_print_debug(void)
 {
-	std::cout << "Lawn start!\n";
-	std::cout << "Map is " << cm->getSize().first << " by " << cm->getSize().second << "\n";
-	AddDecision(decisions, 0, 0, cm->getScore(0, 0));
-
-	// Up
-	update = boost::bind(&StuntzHuntz::_LawnUp, this, _1, _2);
-
-	return 0;
+	std::cout << "_cm_tmp:\n";
+	for (int i=0; i<_cm_tmp.getSize().first; i++) {
+		std::cout << "\n  ";
+		for (int j=0; j<_cm_tmp.getSize().second; j++) {
+			std::cout << _cm_tmp.getScore(i, j) << ", ";
+		}
+	}
+	std::cout << "\n\n";
+	std::cout << "_cm_la:\n";
+	for (int i=0; i<_cm_la.getSize().first; i++) {
+		std::cout << "\n  ";
+		for (int j=0; j<_cm_la.getSize().second; j++) {
+			std::cout << _cm_la.getScore(i, j) << ", ";
+		}
+	}
+	std::cout << "\n\n";
+	std::cout << "cm:\n";
+	for (int i=0; i<cm->getSize().first; i++) {
+		std::cout << "\n  ";
+		for (int j=0; j<cm->getSize().second; j++) {
+			std::cout << cm->getScore(i, j) << ", ";
+		}
+	}
+	std::cout << "\n\n";
 }
 
-int StuntzHuntz::_LawnAcross(decision_t state, std::vector<decision_t> *decisions)
+int StuntzHuntz::getActions(state_t state, std::vector<state_t> *states)
 {
-	std::cout << "Lawn across to " << state.loc.x+1 << ", " << state.loc.y << "\n";
-	AddDecision(decisions, state.loc.x+1, state.loc.y, 0);
+	long x = state.loc.x;
+	long y = state.loc.y;
 
-	// Up or down
-	if (state.loc.y == 0) {
-		update = boost::bind(&StuntzHuntz::_LawnUp, this, _1, _2);
+	std::cout << x << ", " << y << ", " << _cm_tmp.getScore(x,y) << "  ";
+
+	if (_cm_tmp.getScore(x,y+1) > 0) {
+		// Up
+		std::cout << "Up\n";
+		AddDecision(states, x, y+1, 0);
+	}
+	else if (_cm_tmp.getScore(x,y-1) > 0) {
+		// Down
+		std::cout << "Down\n";
+		AddDecision(states, x, y-1, 0);
+	}
+	else if (_cm_tmp.getScore(x+1,y) > 0) {
+		// Across
+		std::cout << "Across\n";
+		AddDecision(states, x+1, y, 0);
 	}
 	else {
-		update = boost::bind(&StuntzHuntz::_LawnDown, this, _1, _2);
+		// End
+		std::cout << "End\n";
 	}
 
-	return 0;
+	_cm_tmp.setScore(x, y, 0);
+	cm_print_debug();
+
+	return 0;   // TODO(yoos): Return number of generated next states.
 }
 
-int StuntzHuntz::_LawnUp(decision_t state, std::vector<decision_t> *decisions)
+int StuntzHuntz::setAction(state_t state)
 {
-	AddDecision(decisions, state.loc.x, state.loc.y+1, 0);
+	// Update real costmap.
+	cm->setScore(state.loc.x, state.loc.y, 0);
 
-	// End if max X, else across if max Y.
-	if (state.loc.x == cm->getSize().first-1) {
-		update = boost::bind(&StuntzHuntz::_LawnEnd, this, _1, _2);
-	}
-	else if (state.loc.y == cm->getSize().second-1) {
-		update = boost::bind(&StuntzHuntz::_LawnAcross, this, _1, _2);
-	}
+	// Reset lookahead costmap.
+	resetLA();
+	resetTmp();
 
 	return 0;
 }
 
-int StuntzHuntz::_LawnDown(decision_t state, std::vector<decision_t> *decisions)
+void StuntzHuntz::resetTmp(void)
 {
-	AddDecision(decisions, state.loc.x, state.loc.y-1, 0);
-
-	// End if max X, else across if min Y.
-	if (state.loc.x == cm->getSize().first-1) {
-		update = boost::bind(&StuntzHuntz::_LawnEnd, this, _1, _2);
-	}
-	else if (state.loc.y == 0) {
-		update = boost::bind(&StuntzHuntz::_LawnAcross, this, _1, _2);
-	}
-
-	return 0;
+	_cm_tmp.copyFrom(&_cm_la);
 }
 
-int StuntzHuntz::_LawnEnd(decision_t state, std::vector<decision_t> *decisions)
+void StuntzHuntz::resetLA(void)
 {
-	return 0;
+	_cm_la.copyFrom(cm);
 }
-
 

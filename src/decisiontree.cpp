@@ -2,13 +2,13 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(int num_lookahead, StuntzHuntz *sh)
+DecisionTree::DecisionTree(int num_lookahead, StuntzHuntz *sh_p)
 {
 	this->num_lookahead = num_lookahead;
 	//dt_update = update_p;
 
-	update = &sh->update;
-	state = &sh->realState;
+	//getActions = &sh->getActions;
+	sh = sh_p;
 
 	vx_t v_start = boost::add_vertex(g);
 	current_vx = v_start;
@@ -19,7 +19,6 @@ void DecisionTree::PruneRecursive(vx_t source_vx, int rec_depth)
 {
 	char indent[rec_depth*2];
 	for (int i=0; i<rec_depth*2; i++) sprintf(indent+i, " ");
-
 
 	// Recurse on any descendant vertices and edges.
 	if (boost::out_degree(source_vx, g) > 0) {
@@ -58,12 +57,13 @@ void DecisionTree::print_debug(void)
 	// Print path
 	std::cout << "Path so far:\n";
 	vx_t print_vx = current_vx;
-	location_t loc = g[current_vx].decision.loc;
+	location_t loc = g[current_vx].state.loc;
 	while (g[print_vx].parent != 0) {
 		std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";
 		print_vx = g[print_vx].parent;
-		loc = g[print_vx].decision.loc;
+		loc = g[print_vx].state.loc;
 	}
+	std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";   // TODO(yoos): Remove redundancy.
 	std::cout << std::endl;
 }
 
@@ -75,32 +75,37 @@ long DecisionTree::Mow(void)
 	// Loop until frontier is empty.
 	//while (frontier.size() > 0) {
 	int arst;
-	for (arst=0; arst<9950; arst++) {
+	for (arst=0; arst<5; arst++) {
+		std::cout << "\n\nLOOP\n\n";
 		for (int i=0; i<num_lookahead; i++) {
+			std::cout << "Lookahead " << i << ", ";
 
 			// Iterate over frontier vertices.
 			long frontier_size = frontier.size();
 			for (long j=0; j<frontier_size; j++) {
+				std::cout << "frontier " << j << "  :  ";
 				// Get decisions from algorithm.
-				std::vector<decision_t> decisions;
-				(*update)(g[frontier.front()].decision, &decisions);
+				std::vector<state_t> states;
+				sh->getActions(g[frontier.front()].state, &states);
 
-				// Add all decisions.
-				for (std::vector<decision_t>::iterator it=decisions.begin(); it!=decisions.end(); it++) {
+				// Add all possible states.
+				for (std::vector<state_t>::iterator it=states.begin(); it!=states.end(); it++) {
 					vx_t v_new = boost::add_vertex(g);
-					boost::add_edge(frontier.front(), v_new, g);
+					edge_t e_new = boost::add_edge(frontier.front(), v_new, g).first;
 					g[v_new].parent = frontier.front();
-					g[v_new].decision = *it;
+					g[v_new].state = *it;
+					g[e_new].action = 0;   // TODO(yoos)
 					frontier.push_back(v_new);
 				}
 
 				// Remove parent from frontier list.
 				frontier.pop_front();
+
+				// Reset alg.
+				sh->resetTmp();
 			}
 
-			// HACK: Reset updater.
-			*update = *state;
-
+			sh->resetLA();
 			//printf("%lu frontier vertices to process after step %d\n", frontier.size(), i+1);
 		}
 		//printf("Done looking ahead %d steps.\n", num_lookahead);
@@ -109,11 +114,11 @@ long DecisionTree::Mow(void)
 		vx_t best_vx = frontier.front();
 		//std::cout << "Frontier size: " << frontier.size() << std::endl;
 		for (std::list<vx_t>::iterator it=frontier.begin(); it!=frontier.end(); it++) {
-			if (g[*it].decision.score > g[best_vx].decision.score) {
+			if (g[*it].state.score > g[best_vx].state.score) {
 				best_vx = *it;
 			}
 		}
-		//std::cout << "Best score found: " << g[best_vx].decision.score << " at " << best_vx << std::endl;
+		//std::cout << "Best score found: " << g[best_vx].state.score << " at " << best_vx << std::endl;
 
 		// Step into best branch and prune the rest.
 		best_ancestor_vx = best_vx;
@@ -127,12 +132,8 @@ long DecisionTree::Mow(void)
 		frontier.clear();
 		frontier.push_back(current_vx);
 
-		// HACK: update real state.
-		std::vector<decision_t> decisions;
-		(*update)(g[current_vx].decision, &decisions);
-		*state = *update;
-
-		score += g[current_vx].decision.score;
+		sh->setAction(g[current_vx].state);
+		score += g[current_vx].state.score;
 	};
 
 	std::cout << std::endl;

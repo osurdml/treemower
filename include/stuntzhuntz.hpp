@@ -8,37 +8,45 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
-struct decision_t {
+/**
+ * @brief State information.
+ */
+struct state_t {
 	location_t loc;
 	float score;
 	float depth;
 };
 
-typedef boost::function<int (decision_t state, std::vector<decision_t> *decisions)> state_t;
+typedef boost::function<int (state_t state, std::vector<state_t> *states)> action_t;
 
 class StuntzHuntz {
 	CostMap *cm;
+	CostMap _cm_la;
+	CostMap _cm_tmp;
 
-	void AddDecision(std::vector<decision_t> *decisions, long x, long y, float score);
+	void AddDecision(std::vector<state_t> *states, long x, long y, float score);
 
-	int _LawnStart (decision_t curDec, std::vector<decision_t> *decisions);
-	int _LawnAcross(decision_t curDec, std::vector<decision_t> *decisions);
-	int _LawnUp    (decision_t curDec, std::vector<decision_t> *decisions);
-	int _LawnDown  (decision_t curDec, std::vector<decision_t> *decisions);
-	int _LawnEnd   (decision_t curDec, std::vector<decision_t> *decisions);
+
+	void cm_print_debug(void);
 
 public:
 	StuntzHuntz(CostMap *cm_p);
 
 	/**
-	 * @brief State machine function pointer that serves to store the state itself during lookahead.
+	 * @brief Get possible actions.
+	 *
+	 * @param state Current state.
+	 *
+	 * @return states Possible next states.
 	 */
-	state_t update;
-	
+	int getActions(state_t state, std::vector<state_t> *states);
+	int setAction(state_t state);
+
 	/**
-	 * @brief Keep track of our real state.
+	 * @brief Reset algorithm, for use after lookahead.
 	 */
-	state_t realState;
+	void resetTmp(void);
+	void resetLA(void);
 };
 
 #endif // STUNTZHUNTZ_HPP

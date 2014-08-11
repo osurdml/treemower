@@ -20,8 +20,11 @@ class CostMap {
 
 public:
 	CostMap(std::ifstream *cm, long rows, long cols);
+	CostMap(CostMap *cm);
 	std::pair<long, long> getSize(void);
-	long getScore(long x, long y);
+	void copyFrom(CostMap *cm);
+	float getScore(long x, long y);
+	int setScore(long x, long y, float score);
 };
 
 #endif // COSTMAP_HPP

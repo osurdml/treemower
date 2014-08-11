@@ -13,13 +13,15 @@
 #include <boost/function.hpp>
 
 typedef boost::adjacency_list<boost::setS, boost::setS>::vertex_descriptor vx_t;
+typedef boost::adjacency_list<boost::setS, boost::setS>::edge_descriptor edge_t;
 
 struct vx_property {
 	vx_t parent;
-	decision_t decision;
+	state_t state;
 };
 
 struct edge_property {
+	action_t action;
 };
 
 typedef boost::adjacency_list<boost::setS, boost::setS, boost::directedS, vx_property, edge_property> Graph;
@@ -29,9 +31,16 @@ class DecisionTree {
 	int num_lookahead;
 	// TODO: costmap
 
+	// TODO: having second thoughts about StuntzHuntz being a modular component
+	// of DecisionTree instead of vice versa. Reasoning behind current
+	// implementation is that DecisionTree will be a component of
+	// a higher-level navigation process, and StuntzHuntz is a decision-making
+	// module. The reverse implementation would have StuntzHuntz interface
+	// directly with navigation, but this is also bad because..
+
 	// Directed graph of possible navigation plans. Each edge represents
-	// a decision, and each vertex represents (via the sequence of edges up to
-	// that vertex) a navigation plan.
+	// an action, and each vertex represents (via the sequence of edges up to
+	// that vertex) a navigation plan composed of state transitions.
 	//
 	// Obviously, this will grow exponentially. So we only make num_lookahead
 	// decisions ahead of our current state, recording the cost to each vertex.
@@ -49,10 +58,10 @@ class DecisionTree {
 	std::list<vx_t> frontier;
 
 	/**
-	 * @brief State machine update function.
+	 * @brief State machine update functions.
 	 */
-	state_t *update;
-	state_t *state;
+	//action_t *getActions;
+	StuntzHuntz *sh;
 
 	/**
 	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
