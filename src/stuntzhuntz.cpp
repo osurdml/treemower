@@ -22,7 +22,7 @@ void StuntzHuntz::cm_print_debug(void)
 	for (int i=0; i<_cm_tmp.getSize().first; i++) {
 		std::cout << "\n  ";
 		for (int j=0; j<_cm_tmp.getSize().second; j++) {
-			std::cout << _cm_tmp.getScore(i, j) << ", ";
+			std::cout << _cm_tmp.getScore(i, j) << " ";
 		}
 	}
 	std::cout << "\n\n";
@@ -30,7 +30,7 @@ void StuntzHuntz::cm_print_debug(void)
 	for (int i=0; i<_cm_la.getSize().first; i++) {
 		std::cout << "\n  ";
 		for (int j=0; j<_cm_la.getSize().second; j++) {
-			std::cout << _cm_la.getScore(i, j) << ", ";
+			std::cout << _cm_la.getScore(i, j) << " ";
 		}
 	}
 	std::cout << "\n\n";
@@ -38,7 +38,7 @@ void StuntzHuntz::cm_print_debug(void)
 	for (int i=0; i<cm->getSize().first; i++) {
 		std::cout << "\n  ";
 		for (int j=0; j<cm->getSize().second; j++) {
-			std::cout << cm->getScore(i, j) << ", ";
+			std::cout << cm->getScore(i, j) << " ";
 		}
 	}
 	std::cout << "\n\n";
@@ -91,11 +91,13 @@ int StuntzHuntz::setAction(state_t state)
 
 void StuntzHuntz::resetTmp(void)
 {
+	std::cout << "resetTmp()\n";
 	_cm_tmp.copyFrom(&_cm_la);
 }
 
 void StuntzHuntz::resetLA(void)
 {
+	std::cout << "resetLA()\n";
 	_cm_la.copyFrom(cm);
 }
 
