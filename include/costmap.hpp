@@ -19,12 +19,15 @@ class CostMap {
 	MatrixXf m;
 
 public:
-	CostMap(std::ifstream *cm, long rows, long cols);
+	CostMap(const char *cm_filename, long rows, long cols, long lookahead);
 	CostMap(CostMap *cm);
 	std::pair<long, long> getSize(void);
 	void copyFrom(CostMap *cm);
 	float getScore(long x, long y);
 	int setScore(long x, long y, float score);
+
+	// Backtrack num_steps number of action steps.
+	void Undo(int num_steps);
 };
 
 #endif // COSTMAP_HPP

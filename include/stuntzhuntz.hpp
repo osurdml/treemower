@@ -20,33 +20,19 @@ struct state_t {
 typedef boost::function<int (state_t state, std::vector<state_t> *states)> action_t;
 
 class StuntzHuntz {
-	CostMap *cm;
-	CostMap _cm_la;
-	CostMap _cm_tmp;
-
-	void AddDecision(std::vector<state_t> *states, long x, long y, float score);
-
-
-	void cm_print_debug(void);
+	static void AddDecision(std::vector<state_t> *states, long x, long y, float score);
+	//void cm_print_debug(void);
 
 public:
-	StuntzHuntz(CostMap *cm_p);
+	StuntzHuntz(void);
 
-	/**
-	 * @brief Get possible actions.
-	 *
-	 * @param state Current state.
-	 *
-	 * @return states Possible next states.
-	 */
-	int getActions(state_t state, std::vector<state_t> *states);
-	int setAction(state_t state);
-
-	/**
-	 * @brief Reset algorithm, for use after lookahead.
-	 */
-	void resetTmp(void);
-	void resetLA(void);
+	// Calculate score based on current state on costmap.
+	//
+	// state: Current state
+	// cm: Pointer to CostMap instance. The costmap will be updated in place.
+	//
+	// returns: Score at current location
+	static float Lawn(state_t state, CostMap *cm, std::vector<state_t> *states);
 };
 
 #endif // STUNTZHUNTZ_HPP

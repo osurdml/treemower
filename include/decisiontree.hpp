@@ -28,8 +28,8 @@ typedef boost::adjacency_list<boost::setS, boost::setS, boost::directedS, vx_pro
 typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 
 class DecisionTree {
-	int num_lookahead;
-	// TODO: costmap
+	CostMap cm;
+	long num_lookahead;
 
 	// TODO: having second thoughts about StuntzHuntz being a modular component
 	// of DecisionTree instead of vice versa. Reasoning behind current
@@ -52,21 +52,32 @@ class DecisionTree {
 	Graph g;
 
 	vx_t current_vx;   // Current vertex.
-	vx_t best_ancestor_vx;   // For processing.
+	float total_score;
 
 	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
-	std::list<vx_t> frontier;
+	//std::list<vx_t> frontier;
 
 	/**
 	 * @brief State machine update functions.
 	 */
 	//action_t *getActions;
-	StuntzHuntz *sh;
+	float (*SomeAlg)(state_t, CostMap*, std::vector<state_t>*);
+
+	// Recursive depth-first lookahead
+	//
+	// source_vx: Source vertex from which we begin the search
+	// depth: Recursion depth. We should not exceed our maximum lookahead step value.
+	//
+	// returns: Number of descendant vertices
+	long LookAhead(vx_t source_vx, long depth);
+
+	// Find best descendant vertex.
+	vx_t FindBest(vx_t source_vx);
 
 	/**
 	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
 	 */
-	void PruneRecursive(vx_t v, int);
+	void Prune(vx_t source_vx, vx_t exclude_vx);
 
 	/**
 	 * @brief Debug
@@ -81,7 +92,7 @@ public:
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
 	 * @param fg Instance of a FrontierGenerator whose update function we will call.
 	 */
-	DecisionTree(int num_lookahead, StuntzHuntz *sh);
+	DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, float (*)(state_t, CostMap*, std::vector<state_t>*), long num_lookahead);
 
 	/**
 	 * @brief Runs treemower.

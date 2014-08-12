@@ -17,18 +17,13 @@ int main(int argc, char **argv)
 	std::cout << "Running Treemower." << std::endl;
 
 	// Get costmap file.
-	const char *cmfilename = argv[1];
-	std::ifstream cmfile(cmfilename);
-	if (!cmfile)
-	{
-		std::cerr << "Failed to open file " << cmfilename << std::endl;
-		return 1;
-	}
-	CostMap cm_input(&cmfile, 3, 3);
-	cmfile.close();
+	const char *cm_filename = argv[1];
+	long rows = 3;
+	long cols = 3;
+	int lookahead = 4;
+	StuntzHuntz sh;
 
-	StuntzHuntz sh(&cm_input);
-	DecisionTree lawn_dt(4, &sh);
+	DecisionTree lawn_dt(cm_filename, rows, cols, &sh.Lawn, lookahead);
 	// TODO: tree_dt
 
 	printf("Lawn score: %ld\n", lawn_dt.Mow());

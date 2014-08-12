@@ -1,21 +1,31 @@
 #include <costmap.hpp>
 
 #include <iostream>
+#include <fstream>
 
-CostMap::CostMap(std::ifstream *cm, long rows, long cols)
+CostMap::CostMap(const char *cm_filename, long rows, long cols, long lookahead)
 {
 	m.resize(rows, cols);
 
+	// Open input file
+	std::ifstream cm(cm_filename);
+	if (!cm)
+	{
+		std::cerr << "Failed to open file " << cm_filename << std::endl;
+	}
+
+	// Read file
 	std::string line;
 	std::string field;
 	for (int i=0; i<rows; i++) {
-		std::getline(*cm, line);
+		std::getline(cm, line);
 		std::istringstream s(line);
 		for (int j=0; j<cols; j++) {
 			std::getline(s, field,',');
 			setScore(i, j, std::atof(field.c_str()));
 		}
 	}
+	cm.close();
 }
 
 CostMap::CostMap(CostMap *cm)
@@ -58,5 +68,9 @@ int CostMap::setScore(long x, long y, float score)
 	m(x, y) = score;
 
 	return 0;
+}
+
+void CostMap::Undo(int num_steps)
+{
 }
 
