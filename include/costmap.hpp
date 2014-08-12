@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fstream>
+#include <vector>
 
 #include <Eigen/Dense>
 
@@ -17,6 +18,9 @@ struct location_t {
 class CostMap {
 	// TODO(yoos): Make dynamic? Multi-layer?
 	MatrixXf m;
+	std::vector<MatrixXf> ms;   // Working copies of the costmap.
+	long m_current;   // Index of current valid costmap
+	long remaining_undos;   // Remaining number of undos
 
 public:
 	CostMap(const char *cm_filename, long rows, long cols, long lookahead);

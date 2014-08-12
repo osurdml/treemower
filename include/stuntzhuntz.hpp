@@ -21,7 +21,7 @@ typedef boost::function<int (state_t state, std::vector<state_t> *states)> actio
 
 class StuntzHuntz {
 	static void AddDecision(std::vector<state_t> *states, long x, long y, float score);
-	//void cm_print_debug(void);
+	void cm_print_debug(void);
 
 public:
 	StuntzHuntz(void);

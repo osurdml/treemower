@@ -6,6 +6,13 @@
 CostMap::CostMap(const char *cm_filename, long rows, long cols, long lookahead)
 {
 	m.resize(rows, cols);
+	for (int i=0; i<lookahead+1; i++) {
+		ms.push_back(MatrixXf(m));
+	}
+	m_current = lookahead;
+	remaining_undos = lookahead;
+
+	std::cout << "Created vector of size " << ms.size() << " lookahead: " << lookahead << "\n\n";
 
 	// Open input file
 	std::ifstream cm(cm_filename);

@@ -11,13 +11,20 @@ DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, 
 	total_score = 0.0;
 
 	// Add base vertex.
-	vx_t v_start = boost::add_vertex(g);
-	current_vx = v_start;
+	vx_t start_vx = boost::add_vertex(g);
+	g[start_vx].parent = 0;
+	g[start_vx].state.loc.x = 0;
+	g[start_vx].state.loc.y = 0;
+	current_vx = start_vx;
 	//frontier.push_back(current_vx);
 }
 
 long DecisionTree::LookAhead(vx_t source_vx, long depth)
 {
+	long x = g[source_vx].state.loc.x;
+	long y = g[source_vx].state.loc.y;
+	std::cout << "LookAhead() " << x << ", " << y << ", " << cm.getScore(x,y) << "  ";
+
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
 	g[source_vx].state.score = (*SomeAlg)(g[source_vx].state, &cm, &future_states);
@@ -120,7 +127,8 @@ void DecisionTree::print_debug(void)
 
 long DecisionTree::Mow(void)
 {
-	while (LookAhead(current_vx, 0) > 0) {
+	for (int i=0; i<4; i++) {
+		LookAhead(current_vx, 0);
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
 		current_vx = best_vx;
