@@ -1,10 +1,6 @@
-function [s,costmap] = score(MapSize)
+function [s] = score(costmap)
+MapSize = size(costmap,1);
 s = zeros(MapSize,MapSize);
-goalX = MapSize;
-goalY = MapSize;
-goalZ = 1;
-[dc,cost,Z2]=MapH(MapSize,5,20,goalX,goalY,goalZ);
-costmap= 10 * cost;
 for x = 1:MapSize
     for y = 1:MapSize
         if x == 1 || y == 1 || x == MapSize || y == MapSize
