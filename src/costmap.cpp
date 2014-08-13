@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 CostMap::CostMap(const char *cm_filename, long rows, long cols, long lookahead)
 {
@@ -106,5 +107,16 @@ int CostMap::Step(int num_steps)
 	}
 	//std::cout << "Step: " << num_steps << "  m_current: " << m_current << "\n";
 	return num_steps;
+}
+
+void CostMap::PrintDebug(void)
+{
+	for (int i=0; i<getSize().first; i++) {
+		std::cout << "\n  ";
+		for (int j=0; j<getSize().second; j++) {
+			std::cout << std::setw(8) << getScore(i, j) << " ";
+		}
+	}
+	std::cout << "\n";
 }
 

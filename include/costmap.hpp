@@ -33,6 +33,8 @@ public:
 
 	// Backtrack num_steps number of action steps, forwards or backwards.
 	int Step(int num_steps);
+
+	void PrintDebug(void);
 };
 
 #endif // COSTMAP_HPP

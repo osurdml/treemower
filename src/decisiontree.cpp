@@ -1,7 +1,5 @@
 #include <decisiontree.hpp>
 
-#include <iomanip>
-
 #include <boost/bind.hpp>
 
 DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, float (*SomeAlg)(state_t, CostMap*, std::vector<state_t>*), long num_lookahead) :
@@ -139,13 +137,7 @@ long DecisionTree::Mow(void)
 		g[current_vx].state.score = (*SomeAlg)(g[current_vx].state, &cm, &future_states);
 
 		// DEBUG
-		//for (int i=0; i<cm.getSize().first; i++) {
-		//	std::cout << "\n  ";
-		//	for (int j=0; j<cm.getSize().second; j++) {
-		//		std::cout << std::setw(8) << cm.getScore(i, j) << " ";
-		//	}
-		//}
-		//std::cout << "\n";
+		//cm.PrintDebug();
 	}
 
 	std::cout << std::endl;
