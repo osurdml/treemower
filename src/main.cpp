@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
 	// Get costmap file.
 	const char *cm_filename = argv[1];
-	long rows = 6;
+	long rows = 7;
 	long cols = 4;
 	int lookahead = 4;
 	StuntzHuntz sh;

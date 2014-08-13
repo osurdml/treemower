@@ -34,8 +34,6 @@ CostMap::CostMap(const char *cm_filename, long rows, long cols, long lookahead)
 	}
 	m_current = lookahead;
 	remaining_undos = lookahead;
-
-	std::cout << "Created vector of size " << ms.size() << " lookahead: " << lookahead << "\n\n";
 }
 
 CostMap::CostMap(CostMap *cm)
