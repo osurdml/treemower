@@ -33,8 +33,8 @@ public:
 	// returns: Score at current location
 	static float Lawn(state_t state, CostMap *cm, std::vector<state_t> *states);
 
-	// Yawei's expanding horizon explorer.
-	static float ExpandingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states);
+	// Yawei's receding horizon explorer.
+	static float RecedingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states);
 };
 
 #endif // STUNTZHUNTZ_HPP
