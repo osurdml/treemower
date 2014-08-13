@@ -106,7 +106,7 @@ int CostMap::Step(int num_steps)
 			return 0;
 		}
 	}
-	std::cout << "Step: " << num_steps << "  m_current: " << m_current << "\n";
+	//std::cout << "Step: " << num_steps << "  m_current: " << m_current << "\n";
 	return num_steps;
 }
 

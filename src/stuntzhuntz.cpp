@@ -34,35 +34,34 @@ float StuntzHuntz::Lawn(state_t state, CostMap *cm, std::vector<state_t> *states
 
 	if (cm->getScore(x,y+1) > 0) {
 		// Up
-		std::cout << "Up\n";
+		//std::cout << "Up\n";
 		AddDecision(states, x, y+1, 0);
 	}
 	else if (cm->getScore(x,y-1) > 0) {
 		// Down
-		std::cout << "Down\n";
+		//std::cout << "Down\n";
 		AddDecision(states, x, y-1, 0);
 	}
 	else if (cm->getScore(x+1,y) > 0) {
 		// Across
-		std::cout << "Across\n";
+		//std::cout << "Across\n";
 		AddDecision(states, x+1, y, 0);
 	}
 	else {
 		// End
-		std::cout << "End\n";
+		//std::cout << "End\n";
 	}
 
 	cm->setScore(x, y, score);
 
 	// Debug
-	std::cout << "cm:\n";
-	for (int i=0; i<cm->getSize().first; i++) {
-		std::cout << "\n  ";
-		for (int j=0; j<cm->getSize().second; j++) {
-			std::cout << cm->getScore(i, j) << " ";
-		}
-	}
-	std::cout << "\n\n";
+	//for (int i=0; i<cm->getSize().first; i++) {
+	//	std::cout << "\n  ";
+	//	for (int j=0; j<cm->getSize().second; j++) {
+	//		std::cout << cm->getScore(i, j) << " ";
+	//	}
+	//}
+	//std::cout << "\n\n";
 
 	return score;   // TODO(yoos): Return number of generated next states.
 }

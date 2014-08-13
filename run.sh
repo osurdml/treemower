@@ -1,5 +1,5 @@
 #!/bin/bash
 
-./treemower data/minimap.txt
+./treemower data/costmap.txt
 exit 0
 

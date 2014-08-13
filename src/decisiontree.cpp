@@ -1,5 +1,7 @@
 #include <decisiontree.hpp>
 
+#include <iomanip>
+
 #include <boost/bind.hpp>
 
 DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, float (*SomeAlg)(state_t, CostMap*, std::vector<state_t>*), long num_lookahead) :
@@ -21,10 +23,10 @@ DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, 
 
 long DecisionTree::LookAhead(vx_t source_vx, long depth)
 {
-	long x = g[source_vx].state.loc.x;
-	long y = g[source_vx].state.loc.y;
-
-	std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << cm.getScore(x,y) << "  ";
+	// DEBUG
+	//long x = g[source_vx].state.loc.x;
+	//long y = g[source_vx].state.loc.y;
+	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << cm.getScore(x,y) << "  ";
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
@@ -49,7 +51,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 			for(; edges.first != edges.second; edges.first++) {
 				cm.Step(1);
 				vx_t child_vx = boost::target(*edges.first, g);
-				num_children += LookAhead(child_vx, depth+1);
+				num_children += LookAhead(child_vx, depth+1) + 1;   // This child plus its children
 				cm.Step(-1);
 			}
 		}
@@ -68,7 +70,7 @@ vx_t DecisionTree::FindBest(vx_t source_vx)
 		for(; edges.first != edges.second; edges.first++) {
 			vx_t child_vx = boost::target(*edges.first, g);
 			float child_score = g[FindBest(child_vx)].state.score;
-			if (child_score > best_score) {
+			if (child_score >= best_score) {
 				best_vx = child_vx;
 				best_score = child_score;
 			}
@@ -125,11 +127,25 @@ void DecisionTree::print_debug(void)
 
 long DecisionTree::Mow(void)
 {
-	for (int i=0; i<4; i++) {
-		LookAhead(current_vx, 0);
+	while (LookAhead(current_vx, 0) > 0) {
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
 		current_vx = best_vx;
+
+		// Step costmap forward.
+		cm.Step(1);
+		// TODO(yoos): Clean this up.
+		std::vector<state_t> future_states;
+		g[current_vx].state.score = (*SomeAlg)(g[current_vx].state, &cm, &future_states);
+
+		// DEBUG
+		for (int i=0; i<cm.getSize().first; i++) {
+			std::cout << "\n  ";
+			for (int j=0; j<cm.getSize().second; j++) {
+				std::cout << std::setw(8) << cm.getScore(i, j) << " ";
+			}
+		}
+		std::cout << "\n";
 	}
 
 	std::cout << std::endl;
