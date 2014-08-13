@@ -17,7 +17,8 @@ struct location_t {
 
 class CostMap {
 	// TODO(yoos): Make dynamic? Multi-layer?
-	MatrixXf m;
+	long max_lookahead;
+	MatrixXf m_orig;
 	std::vector<MatrixXf> ms;   // Working copies of the costmap.
 	long m_current;   // Index of current valid costmap
 	long remaining_undos;   // Remaining number of undos
@@ -30,8 +31,8 @@ public:
 	float getScore(long x, long y);
 	int setScore(long x, long y, float score);
 
-	// Backtrack num_steps number of action steps.
-	void Undo(int num_steps);
+	// Backtrack num_steps number of action steps, forwards or backwards.
+	int Step(int num_steps);
 };
 
 #endif // COSTMAP_HPP

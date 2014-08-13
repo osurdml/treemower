@@ -5,14 +5,8 @@
 
 CostMap::CostMap(const char *cm_filename, long rows, long cols, long lookahead)
 {
-	m.resize(rows, cols);
-	for (int i=0; i<lookahead+1; i++) {
-		ms.push_back(MatrixXf(m));
-	}
-	m_current = lookahead;
-	remaining_undos = lookahead;
-
-	std::cout << "Created vector of size " << ms.size() << " lookahead: " << lookahead << "\n\n";
+	max_lookahead = lookahead;
+	m_orig.resize(rows, cols);
 
 	// Open input file
 	std::ifstream cm(cm_filename);
@@ -29,10 +23,19 @@ CostMap::CostMap(const char *cm_filename, long rows, long cols, long lookahead)
 		std::istringstream s(line);
 		for (int j=0; j<cols; j++) {
 			std::getline(s, field,',');
-			setScore(i, j, std::atof(field.c_str()));
+			m_orig(i, j) = std::atof(field.c_str());
 		}
 	}
 	cm.close();
+
+	// Set up undo buffer.
+	for (int i=0; i<lookahead+1; i++) {
+		ms.push_back(MatrixXf(m_orig));
+	}
+	m_current = lookahead;
+	remaining_undos = lookahead;
+
+	std::cout << "Created vector of size " << ms.size() << " lookahead: " << lookahead << "\n\n";
 }
 
 CostMap::CostMap(CostMap *cm)
@@ -43,16 +46,16 @@ CostMap::CostMap(CostMap *cm)
 
 std::pair<long, long> CostMap::getSize(void)
 {
-	return std::pair<long, long> (m.rows(), m.cols());
+	return std::pair<long, long> (ms[m_current].rows(), ms[m_current].cols());
 }
 
 void CostMap::copyFrom(CostMap *cm)
 {
-	m.resize(cm->getSize().first, cm->getSize().second);
+	ms[m_current].resize(cm->getSize().first, cm->getSize().second);
 
 	// TODO(yoos): Maybe use block operations with a pointer to the score matrix.
-	for (long i=0; i<m.rows(); i++) {
-		for (long j=0; j<m.cols(); j++) {
+	for (long i=0; i<ms[m_current].rows(); i++) {
+		for (long j=0; j<ms[m_current].cols(); j++) {
 			setScore(i, j, cm->getScore(i, j));
 		}
 	}
@@ -60,24 +63,50 @@ void CostMap::copyFrom(CostMap *cm)
 
 float CostMap::getScore(long x, long y)
 {
-	if (x < 0 || y < 0 || x > m.rows()-1 || y > m.cols()-1) {
+	if (x < 0 || y < 0 || x > ms[m_current].rows()-1 || y > ms[m_current].cols()-1) {
 		return -1;
 	}
-	return m(x, y);
+	return ms[m_current](x, y);
 }
 
 int CostMap::setScore(long x, long y, float score)
 {
-	if (x < 0 || y < 0 || x > m.rows()-1 || y > m.cols()-1) {
+	if (x < 0 || y < 0 || x > ms[m_current].rows()-1 || y > ms[m_current].cols()-1) {
 		return -1;
 	}
 
-	m(x, y) = score;
+	ms[m_current](x, y) = score;
 
 	return 0;
 }
 
-void CostMap::Undo(int num_steps)
+int CostMap::Step(int num_steps)
 {
+	// TODO(yoos): Use min/max function.
+	if (num_steps > 0) {
+		// Unconditionally step forward, possibly losing some history.
+		long m_prev = m_current;
+		m_current = (m_current+num_steps) % (max_lookahead+1);
+
+		// Copy matrix
+		ms[m_current] = ms[m_prev];
+
+		remaining_undos += num_steps;
+		if (remaining_undos > max_lookahead) {
+			remaining_undos = max_lookahead;
+		}
+	}
+	else {
+		// Step backward if enough undos are available.
+		if (remaining_undos > num_steps) {
+			m_current = (m_current+max_lookahead+1+num_steps) % (max_lookahead+1);
+			remaining_undos += num_steps;
+		}
+		else {
+			return 0;
+		}
+	}
+	std::cout << "Step: " << num_steps << "  m_current: " << m_current << "\n";
+	return num_steps;
 }
 

@@ -23,7 +23,8 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 {
 	long x = g[source_vx].state.loc.x;
 	long y = g[source_vx].state.loc.y;
-	std::cout << "LookAhead() " << x << ", " << y << ", " << cm.getScore(x,y) << "  ";
+
+	std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << cm.getScore(x,y) << "  ";
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
@@ -43,6 +44,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 		}
 
 		// Recurse on children.
+		cm.Step(1);
 		if (boost::out_degree(source_vx, g) > 0) {
 			std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, g);
 			for(; edges.first != edges.second; edges.first++) {
@@ -52,10 +54,10 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 				num_children += LookAhead(child_vx, depth+1);
 			}
 		}
-	}
 
-	// Undo one step.
-	cm.Undo(1);
+		// Undo one step.
+		cm.Step(-1);
+	}
 
 	return num_children;
 }
