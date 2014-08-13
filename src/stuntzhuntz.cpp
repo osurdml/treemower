@@ -48,3 +48,7 @@ float StuntzHuntz::Lawn(state_t state, CostMap *cm, std::vector<state_t> *states
 	return score;   // TODO(yoos): Return number of generated next states.
 }
 
+float StuntzHuntz::ExpandingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states)
+{
+}
+

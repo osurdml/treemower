@@ -21,7 +21,6 @@ typedef boost::function<int (state_t state, std::vector<state_t> *states)> actio
 
 class StuntzHuntz {
 	static void AddDecision(std::vector<state_t> *states, long x, long y, float score);
-	void cm_print_debug(void);
 
 public:
 	StuntzHuntz(void);
@@ -33,6 +32,9 @@ public:
 	//
 	// returns: Score at current location
 	static float Lawn(state_t state, CostMap *cm, std::vector<state_t> *states);
+
+	// Yawei's expanding horizon explorer.
+	static float ExpandingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states);
 };
 
 #endif // STUNTZHUNTZ_HPP
