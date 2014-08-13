@@ -2,7 +2,8 @@
 
 #include <stdio.h>
 
-StuntzHuntz::StuntzHuntz(void)
+StuntzHuntz::StuntzHuntz(const char *cm_filename, long rows, long cols, int lookahead) :
+	dt(cm_filename, rows, cols, &Lawn, lookahead)
 {
 }
 
@@ -55,5 +56,8 @@ float StuntzHuntz::RecedingHorizon(state_t state, CostMap *cm, std::vector<state
 
 	float score = 0.0;
 
+float StuntzHuntz::Run(void)
+{
+	return dt.Mow();
 }
 

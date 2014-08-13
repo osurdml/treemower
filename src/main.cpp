@@ -3,8 +3,6 @@
 #include <iostream>
 #include <fstream>
 
-#include <costmap.hpp>
-#include <decisiontree.hpp>
 #include <stuntzhuntz.hpp>
 
 int main(int argc, char **argv)
@@ -21,12 +19,9 @@ int main(int argc, char **argv)
 	long rows = 7;
 	long cols = 4;
 	int lookahead = 4;
-	StuntzHuntz sh;
+	StuntzHuntz sh(cm_filename, rows, cols, lookahead);
 
-	DecisionTree lawn_dt(cm_filename, rows, cols, &sh.Lawn, lookahead);
-	// TODO: tree_dt
-
-	printf("Lawn score: %ld\n", lawn_dt.Mow());
+	printf("Lawn score: %f\n", sh.Run());
 
 	return 0;
 }

@@ -2,7 +2,6 @@
 #define DECISIONTREE_HPP
 
 #include <costmap.hpp>
-#include <stuntzhuntz.hpp>
 
 #include <stdio.h>
 #include <vector>
@@ -14,6 +13,17 @@
 
 typedef boost::adjacency_list<boost::setS, boost::setS>::vertex_descriptor vx_t;
 typedef boost::adjacency_list<boost::setS, boost::setS>::edge_descriptor edge_t;
+
+/**
+ * @brief State information.
+ */
+struct state_t {
+	location_t loc;
+	float score;
+	float depth;
+};
+
+typedef boost::function<int (state_t state, std::vector<state_t> *states)> action_t;
 
 struct vx_property {
 	vx_t parent;
@@ -82,7 +92,7 @@ class DecisionTree {
 	/**
 	 * @brief Debug
 	 */
-	void print_debug(void);
+	void PrintDebug(void);
 	// vx_t BreakTie(vector<vx_t> v);
 
 public:
@@ -99,7 +109,7 @@ public:
 	 *
 	 * @return The score
 	 */
-	long Mow(void);
+	float Mow(void);
 };
 
 #endif // DECISIONTREE_HPP

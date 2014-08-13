@@ -99,7 +99,7 @@ void DecisionTree::Prune(vx_t source_vx, vx_t exclude_vx)
 	}
 }
 
-void DecisionTree::print_debug(void)
+void DecisionTree::PrintDebug(void)
 {
 	// General info
 	std::cout << "Graph contains " << boost::num_edges(g) << " edges, " << boost::num_vertices(g) << " vertices." << std::endl;
@@ -117,7 +117,7 @@ void DecisionTree::print_debug(void)
 	std::cout << std::endl;
 }
 
-long DecisionTree::Mow(void)
+float DecisionTree::Mow(void)
 {
 	while (LookAhead(current_vx, 0) > 0) {
 		vx_t best_vx = FindBest(current_vx);

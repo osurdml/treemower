@@ -2,28 +2,20 @@
 #define STUNTZHUNTZ_HPP
 
 #include <costmap.hpp>
+#include <decisiontree.hpp>
 
 #include <stdlib.h>
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
-/**
- * @brief State information.
- */
-struct state_t {
-	location_t loc;
-	float score;
-	float depth;
-};
-
-typedef boost::function<int (state_t state, std::vector<state_t> *states)> action_t;
-
 class StuntzHuntz {
+	DecisionTree dt;
+
 	static void AddDecision(std::vector<state_t> *states, long x, long y, float score);
 
 public:
-	StuntzHuntz(void);
+	StuntzHuntz(const char *cm_filename, long rows, long cols, int lookahead);
 
 	// Calculate score based on current state on costmap.
 	//
@@ -35,6 +27,13 @@ public:
 
 	// Yawei's receding horizon explorer.
 	static float RecedingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states);
+
+	/**
+	 * @brief Mow.
+	 *
+	 * @return Score.
+	 */
+	float Run(void);
 };
 
 #endif // STUNTZHUNTZ_HPP
