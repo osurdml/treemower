@@ -50,5 +50,10 @@ float StuntzHuntz::Lawn(state_t state, CostMap *cm, std::vector<state_t> *states
 
 float StuntzHuntz::ExpandingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states)
 {
+	long x = state.loc.x;
+	long y = state.loc.y;
+
+	float score = 0.0;
+		
 }
 
