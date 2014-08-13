@@ -41,17 +41,11 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 			g[new_vx].parent = source_vx;
 			g[new_vx].state = *it;
 			g[new_edge].action = 0;   // TODO(yoos)
-		}
 
-		// Recurse on children.
-		if (boost::out_degree(source_vx, g) > 0) {
-			std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, g);
-			for(; edges.first != edges.second; edges.first++) {
-				cm.Step(1);
-				vx_t child_vx = boost::target(*edges.first, g);
-				num_children += LookAhead(child_vx, depth+1) + 1;   // This child plus its children
-				cm.Step(-1);
-			}
+			// Recurse on child.
+			cm.Step(1);
+			num_children += LookAhead(new_vx, depth+1) + 1;   // This child plus its children
+			cm.Step(-1);
 		}
 	}
 
