@@ -38,8 +38,34 @@ typedef boost::adjacency_list<boost::setS, boost::setS, boost::directedS, vx_pro
 typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 
 class DecisionTree {
-	CostMap cm;
 	long num_lookahead;
+	vx_t current_vx;   // Current vertex.
+	float total_score;
+
+	// Recursive depth-first lookahead
+	//
+	// source_vx: Source vertex from which we begin the search
+	// depth: Recursion depth. We should not exceed our maximum lookahead step value.
+	//
+	// returns: Number of descendant vertices
+	long LookAhead(vx_t source_vx, long depth);
+
+	/**
+	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
+	 */
+	void Prune(vx_t source_vx, vx_t exclude_vx);
+
+	/**
+	 * @brief Debug
+	 */
+	void PrintDebug(void);
+	// vx_t BreakTie(vector<vx_t> v);
+
+	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
+	//std::list<vx_t> frontier;
+
+protected:
+	CostMap cm;
 
 	// TODO: having second thoughts about StuntzHuntz being a modular component
 	// of DecisionTree instead of vice versa. Reasoning behind current
@@ -61,39 +87,19 @@ class DecisionTree {
 	// num_lookahead value.
 	Graph g;
 
-	vx_t current_vx;   // Current vertex.
-	float total_score;
-
-	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
-	//std::list<vx_t> frontier;
-
 	/**
 	 * @brief State machine update functions.
 	 */
-	//action_t *getActions;
-	float (*SomeAlg)(state_t, CostMap*, std::vector<state_t>*);
-
-	// Recursive depth-first lookahead
-	//
-	// source_vx: Source vertex from which we begin the search
-	// depth: Recursion depth. We should not exceed our maximum lookahead step value.
-	//
-	// returns: Number of descendant vertices
-	long LookAhead(vx_t source_vx, long depth);
-
-	// Find best descendant vertex.
-	vx_t FindBest(vx_t source_vx);
+	virtual float Explore(state_t, CostMap*, std::vector<state_t>*) = 0;
 
 	/**
-	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
+	 * @brief Find the best vertex among immediate descendants of a given vertex.
+	 *
+	 * @param source_vx Source vertex.
+	 *
+	 * @return Best vertex.
 	 */
-	void Prune(vx_t source_vx, vx_t exclude_vx);
-
-	/**
-	 * @brief Debug
-	 */
-	void PrintDebug(void);
-	// vx_t BreakTie(vector<vx_t> v);
+	virtual vx_t FindBest(vx_t source_vx) = 0;
 
 public:
 	/**
@@ -102,7 +108,7 @@ public:
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
 	 * @param fg Instance of a FrontierGenerator whose update function we will call.
 	 */
-	DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, float (*)(state_t, CostMap*, std::vector<state_t>*), long num_lookahead);
+	DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, long num_lookahead);
 
 	/**
 	 * @brief Runs treemower.

@@ -2,11 +2,10 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, float (*SomeAlg)(state_t, CostMap*, std::vector<state_t>*), long num_lookahead) :
+DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, long num_lookahead) :
 	cm(cm_filename, cm_rows, cm_cols, num_lookahead)
 {
 	this->num_lookahead = num_lookahead;
-	this->SomeAlg = SomeAlg;
 
 	total_score = 0.0;
 
@@ -28,7 +27,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
-	g[source_vx].state.score = (*SomeAlg)(g[source_vx].state, &cm, &future_states);
+	g[source_vx].state.score = Explore(g[source_vx].state, &cm, &future_states);
 	total_score += g[source_vx].state.score;   // TODO(yoos): What is this score?
 
 	long num_children = 0;
@@ -50,26 +49,6 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 	}
 
 	return num_children;
-}
-
-vx_t DecisionTree::FindBest(vx_t source_vx)
-{
-	vx_t best_vx = source_vx;
-	float best_score = g[source_vx].state.score;
-
-	if (boost::out_degree(source_vx, g) > 0) {
-		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, g);
-		for(; edges.first != edges.second; edges.first++) {
-			vx_t child_vx = boost::target(*edges.first, g);
-			float child_score = g[FindBest(child_vx)].state.score;
-			if (child_score >= best_score) {
-				best_vx = child_vx;
-				best_score = child_score;
-			}
-		}
-	}
-
-	return best_vx;
 }
 
 void DecisionTree::Prune(vx_t source_vx, vx_t exclude_vx)
@@ -128,14 +107,14 @@ float DecisionTree::Mow(void)
 		cm.Step(1);
 		// TODO(yoos): Clean this up.
 		std::vector<state_t> future_states;
-		g[current_vx].state.score = (*SomeAlg)(g[current_vx].state, &cm, &future_states);
+		g[current_vx].state.score = Explore(g[current_vx].state, &cm, &future_states);
 
 		// DEBUG
 		//cm.PrintDebug();
 	}
 
 	std::cout << std::endl;
-	print_debug();
+	PrintDebug();
 
 	return total_score;
 }

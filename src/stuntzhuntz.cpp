@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 StuntzHuntz::StuntzHuntz(const char *cm_filename, long rows, long cols, int lookahead) :
-	dt(cm_filename, rows, cols, &Lawn, lookahead)
+	DecisionTree(cm_filename, rows, cols, lookahead)
 {
 }
 
@@ -13,7 +13,7 @@ void StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, floa
 	states->push_back(d);
 }
 
-float StuntzHuntz::Lawn(state_t state, CostMap *cm, std::vector<state_t> *states)
+float StuntzHuntz::Explore(state_t state, CostMap *cm, std::vector<state_t> *states)
 {
 	long x = state.loc.x;
 	long y = state.loc.y;
@@ -47,6 +47,26 @@ float StuntzHuntz::Lawn(state_t state, CostMap *cm, std::vector<state_t> *states
 	//cm->PrintDebug();
 
 	return score;   // TODO(yoos): Return number of generated next states.
+}
+
+vx_t StuntzHuntz::FindBest(vx_t source_vx)
+{
+	vx_t best_vx = source_vx;
+	float best_score = g[source_vx].state.score;
+
+	if (boost::out_degree(source_vx, g) > 0) {
+		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, g);
+		for(; edges.first != edges.second; edges.first++) {
+			vx_t child_vx = boost::target(*edges.first, g);
+			float child_score = g[FindBest(child_vx)].state.score;
+			if (child_score >= best_score) {
+				best_vx = child_vx;
+				best_score = child_score;
+			}
+		}
+	}
+
+	return best_vx;
 }
 
 float StuntzHuntz::RecedingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states)

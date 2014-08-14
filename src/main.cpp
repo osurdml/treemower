@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	int lookahead = 4;
 	StuntzHuntz sh(cm_filename, rows, cols, lookahead);
 
-	printf("Lawn score: %f\n", sh.Run());
+	printf("Lawn score: %f\n", sh.Mow());
 
 	return 0;
 }
