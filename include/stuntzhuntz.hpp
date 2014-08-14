@@ -11,7 +11,7 @@
 
 class StuntzHuntz : public DecisionTree {
 	static void AddDecision(std::vector<state_t> *states, long x, long y, float score);
-	float Explore(state_t state, CostMap *cm, std::vector<state_t> *states);
+	float Explore(state_t state, std::vector<state_t> *states);
 	vx_t FindBest(vx_t source_vx);
 
 public:

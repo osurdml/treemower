@@ -10,10 +10,10 @@ DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, 
 	total_score = 0.0;
 
 	// Add base vertex.
-	vx_t start_vx = boost::add_vertex(g);
-	g[start_vx].parent = 0;
-	g[start_vx].state.loc.x = 0;
-	g[start_vx].state.loc.y = 0;
+	vx_t start_vx = boost::add_vertex(dTree);
+	dTree[start_vx].parent = 0;
+	dTree[start_vx].state.loc.x = 0;
+	dTree[start_vx].state.loc.y = 0;
 	current_vx = start_vx;
 	//frontier.push_back(current_vx);
 }
@@ -21,25 +21,25 @@ DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, 
 long DecisionTree::LookAhead(vx_t source_vx, long depth)
 {
 	// DEBUG
-	//long x = g[source_vx].state.loc.x;
-	//long y = g[source_vx].state.loc.y;
+	//long x = dTree[source_vx].state.loc.x;
+	//long y = dTree[source_vx].state.loc.y;
 	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << cm.getScore(x,y) << "  ";
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
-	g[source_vx].state.score = Explore(g[source_vx].state, &cm, &future_states);
-	total_score += g[source_vx].state.score;   // TODO(yoos): What is this score?
+	dTree[source_vx].state.score = Explore(dTree[source_vx].state, &future_states);
+	total_score += dTree[source_vx].state.score;   // TODO(yoos): What is this score?
 
 	long num_children = 0;
 
 	if (depth < num_lookahead) {
 		// Add all future states to graph.
 		for (std::vector<state_t>::iterator it=future_states.begin(); it!=future_states.end(); it++) {
-			vx_t new_vx = boost::add_vertex(g);
-			edge_t new_edge = boost::add_edge(source_vx, new_vx, g).first;
-			g[new_vx].parent = source_vx;
-			g[new_vx].state = *it;
-			g[new_edge].action = 0;   // TODO(yoos)
+			vx_t new_vx = boost::add_vertex(dTree);
+			edge_t new_edge = boost::add_edge(source_vx, new_vx, dTree).first;
+			dTree[new_vx].parent = source_vx;
+			dTree[new_vx].state = *it;
+			dTree[new_edge].action = 0;   // TODO(yoos)
 
 			// Recurse on child.
 			cm.Step(1);
@@ -54,9 +54,9 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 void DecisionTree::Prune(vx_t source_vx, vx_t exclude_vx)
 {
 	// Recurse on any descendant vertices and edges.
-	if (boost::out_degree(source_vx, g) > 0) {
-		//std::cout << indent << "Pruning vertex " << source_vx << " with " << boost::out_degree(source_vx, g) << " descendants" << std::endl;
-		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, g);
+	if (boost::out_degree(source_vx, dTree) > 0) {
+		//std::cout << indent << "Pruning vertex " << source_vx << " with " << boost::out_degree(source_vx, dTree) << " descendants" << std::endl;
+		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, dTree);
 
 		// Create removal list. If we iterate over the edge iterator while
 		// removing edges, unhappy things happen.
@@ -66,13 +66,13 @@ void DecisionTree::Prune(vx_t source_vx, vx_t exclude_vx)
 		}
 
 		for (std::list<Graph::edge_descriptor>::iterator it=rl.begin(); it!=rl.end(); ++it) {
-			vx_t target_vx = boost::target(*it, g);
+			vx_t target_vx = boost::target(*it, dTree);
 
 			DecisionTree::Prune(target_vx, exclude_vx);
 			if (target_vx != exclude_vx) {
 				// Remove target vertex and edge (edge first!)
-				boost::remove_edge(*it, g);
-				boost::remove_vertex(target_vx, g);
+				boost::remove_edge(*it, dTree);
+				boost::remove_vertex(target_vx, dTree);
 			}
 		}
 	}
@@ -81,16 +81,16 @@ void DecisionTree::Prune(vx_t source_vx, vx_t exclude_vx)
 void DecisionTree::PrintDebug(void)
 {
 	// General info
-	std::cout << "Graph contains " << boost::num_edges(g) << " edges, " << boost::num_vertices(g) << " vertices." << std::endl;
+	std::cout << "Graph contains " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
 
 	// Print path
 	std::cout << "Path so far:\n";
 	vx_t print_vx = current_vx;
-	location_t loc = g[current_vx].state.loc;
-	while (g[print_vx].parent != 0) {
+	location_t loc = dTree[current_vx].state.loc;
+	while (dTree[print_vx].parent != 0) {
 		std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";
-		print_vx = g[print_vx].parent;
-		loc = g[print_vx].state.loc;
+		print_vx = dTree[print_vx].parent;
+		loc = dTree[print_vx].state.loc;
 	}
 	std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";   // TODO(yoos): Remove redundancy.
 	std::cout << std::endl;
@@ -107,7 +107,7 @@ float DecisionTree::Mow(void)
 		cm.Step(1);
 		// TODO(yoos): Clean this up.
 		std::vector<state_t> future_states;
-		g[current_vx].state.score = Explore(g[current_vx].state, &cm, &future_states);
+		dTree[current_vx].state.score = Explore(dTree[current_vx].state, &future_states);
 
 		// DEBUG
 		//cm.PrintDebug();

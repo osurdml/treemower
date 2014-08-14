@@ -42,16 +42,21 @@ class DecisionTree {
 	vx_t current_vx;   // Current vertex.
 	float total_score;
 
-	// Recursive depth-first lookahead
-	//
-	// source_vx: Source vertex from which we begin the search
-	// depth: Recursion depth. We should not exceed our maximum lookahead step value.
-	//
-	// returns: Number of descendant vertices
+	/**
+	 * @brief Recursive depth-first lookahead.
+	 *
+	 * @param source_vx Source vertex from which we begin the search.
+	 * @param depth Recursion depth. We should not exceed our maximum lookahead step value.
+	 *
+	 * @return Number of descendants under the source vertex.
+	 */
 	long LookAhead(vx_t source_vx, long depth);
 
 	/**
 	 * @brief Recursively prune all branches excluding best ancestor node of best branch.
+	 *
+	 * @param source_vx Source vertex from which we begin the search.
+	 * @param exclude_vx Vertex to exclude. Descendants of this vertex will still be pruned.
 	 */
 	void Prune(vx_t source_vx, vx_t exclude_vx);
 
@@ -67,30 +72,27 @@ class DecisionTree {
 protected:
 	CostMap cm;
 
-	// TODO: having second thoughts about StuntzHuntz being a modular component
-	// of DecisionTree instead of vice versa. Reasoning behind current
-	// implementation is that DecisionTree will be a component of
-	// a higher-level navigation process, and StuntzHuntz is a decision-making
-	// module. The reverse implementation would have StuntzHuntz interface
-	// directly with navigation, but this is also bad because..
-
-	// Directed graph of possible navigation plans. Each edge represents
-	// an action, and each vertex represents (via the sequence of edges up to
-	// that vertex) a navigation plan composed of state transitions.
-	//
-	// Obviously, this will grow exponentially. So we only make num_lookahead
-	// decisions ahead of our current state, recording the cost to each vertex.
-	// We then choose the best, take one step towards the best-cost target, and
-	// discard all other branches.
-	//
-	// Hopefully we'll be able to find a point of diminishing returns with some
-	// num_lookahead value.
-	Graph g;
+	/**
+	 * @brief Directed graph of possible navigation plans.
+	 *
+	 * Each edge represents an action, and each vertex represents (via the
+	 * sequence of edges up to that vertex) a navigation plan composed of state
+	 * transitions.
+	 * 
+	 * Obviously, this will grow exponentially. So we only make num_lookahead
+	 * decisions ahead of our current state, recording the cost to each vertex.
+	 * We then choose the best, take one step towards the best-cost target, and
+	 * discard all other branches.
+	 * 
+	 * Hopefully we'll be able to find a point of diminishing returns with some
+	 * num_lookahead value.
+	 */
+	Graph dTree;
 
 	/**
 	 * @brief State machine update functions.
 	 */
-	virtual float Explore(state_t, CostMap*, std::vector<state_t>*) = 0;
+	virtual float Explore(state_t, std::vector<state_t>*) = 0;
 
 	/**
 	 * @brief Find the best vertex among immediate descendants of a given vertex.

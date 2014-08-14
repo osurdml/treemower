@@ -13,7 +13,7 @@ void StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, floa
 	states->push_back(d);
 }
 
-float StuntzHuntz::Explore(state_t state, CostMap *cm, std::vector<state_t> *states)
+float StuntzHuntz::Explore(state_t state, std::vector<state_t> *states)
 {
 	long x = state.loc.x;
 	long y = state.loc.y;
@@ -23,7 +23,7 @@ float StuntzHuntz::Explore(state_t state, CostMap *cm, std::vector<state_t> *sta
 	{
 		for(int j = -1;j < 2; j++)
 		{
-			if(cm->getScore(x+i,y+j) >= 0 || (i != 0 && j != 0))
+			if(cm.getScore(x+i,y+j) >= 0 || (i != 0 && j != 0))
 				AddDecision(states,x+i,y+j,3);
 		}
 	}
@@ -32,13 +32,13 @@ float StuntzHuntz::Explore(state_t state, CostMap *cm, std::vector<state_t> *sta
 vx_t StuntzHuntz::FindBest(vx_t source_vx)
 {
 	vx_t best_vx = source_vx;
-	float best_score = g[source_vx].state.score;
+	float best_score = dTree[source_vx].state.score;
 
-	if (boost::out_degree(source_vx, g) > 0) {
-		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, g);
+	if (boost::out_degree(source_vx, dTree) > 0) {
+		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, dTree);
 		for(; edges.first != edges.second; edges.first++) {
-			vx_t child_vx = boost::target(*edges.first, g);
-			float child_score = g[FindBest(child_vx)].state.score;
+			vx_t child_vx = boost::target(*edges.first, dTree);
+			float child_score = dTree[FindBest(child_vx)].state.score;
 			if (child_score >= best_score) {
 				best_vx = child_vx;
 				best_score = child_score;
