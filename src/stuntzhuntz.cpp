@@ -18,35 +18,15 @@ float StuntzHuntz::Explore(state_t state, CostMap *cm, std::vector<state_t> *sta
 	long x = state.loc.x;
 	long y = state.loc.y;
 
-	// Calculate score at current location
 	float score = 0.0;
-
-	if (cm->getScore(x,y+1) > 0) {
-		// Up
-		//std::cout << "Up\n";
-		AddDecision(states, x, y+1, 0);
+	for(int i = -1; i < 2; i++)
+	{
+		for(int j = -1;j < 2; j++)
+		{
+			if(cm->getScore(x+i,y+j) >= 0 || (i != 0 && j != 0))
+				AddDecision(states,x+i,y+j,3);
+		}
 	}
-	else if (cm->getScore(x,y-1) > 0) {
-		// Down
-		//std::cout << "Down\n";
-		AddDecision(states, x, y-1, 0);
-	}
-	else if (cm->getScore(x+1,y) > 0) {
-		// Across
-		//std::cout << "Across\n";
-		AddDecision(states, x+1, y, 0);
-	}
-	else {
-		// End
-		//std::cout << "End\n";
-	}
-
-	cm->setScore(x, y, score);
-
-	// Debug
-	//cm->PrintDebug();
-
-	return score;   // TODO(yoos): Return number of generated next states.
 }
 
 vx_t StuntzHuntz::FindBest(vx_t source_vx)
@@ -69,20 +49,4 @@ vx_t StuntzHuntz::FindBest(vx_t source_vx)
 	return best_vx;
 }
 
-float StuntzHuntz::RecedingHorizon(state_t state, CostMap *cm, std::vector<state_t> *states)
-{
-	long x = state.loc.x;
-	long y = state.loc.y;
-
-	float score = 0.0;
-	for(int i = -1; i < 2; i++)
-	{
-		for(int j = -1;j < 2; j++)
-		{
-			if(cm->getScore(x+i,y+j) >= 0 || (i != 0 && j != 0))
-				AddDecision(states,x+i,y+j,3);
-		}
-	}
-	
-}
 

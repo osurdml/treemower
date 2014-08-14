@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <lawnmower.hpp>
 #include <stuntzhuntz.hpp>
 
 int main(int argc, char **argv)
@@ -19,9 +20,11 @@ int main(int argc, char **argv)
 	long rows = 7;
 	long cols = 4;
 	int lookahead = 4;
+	Lawnmower lm(cm_filename, rows, cols, lookahead);
 	StuntzHuntz sh(cm_filename, rows, cols, lookahead);
 
-	printf("Lawn score: %f\n", sh.Mow());
+	printf("Lawn score: %f\n", lm.Mow());
+	printf("RH score: %f\n", sh.Mow());
 
 	return 0;
 }
