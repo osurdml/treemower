@@ -55,9 +55,14 @@ float StuntzHuntz::RecedingHorizon(state_t state, CostMap *cm, std::vector<state
 	long y = state.loc.y;
 
 	float score = 0.0;
-
-float StuntzHuntz::Run(void)
-{
-	return dt.Mow();
+	for(int i = -1; i < 2; i++)
+	{
+		for(int j = -1;j < 2; j++)
+		{
+			if(cm->getScore(x+i,y+j) >= 0 || (i != 0 && j != 0))
+				AddDecision(states,x+i,y+j,3);
+		}
+	}
+	
 }
 
