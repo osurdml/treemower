@@ -26,10 +26,10 @@ class CostMap {
 public:
 	CostMap(const char *cm_filename, long rows, long cols, long lookahead);
 	CostMap(CostMap *cm);
-	std::pair<long, long> getSize(void);
-	void copyFrom(CostMap *cm);
-	float getScore(long x, long y);
-	int setScore(long x, long y, float score);
+	std::pair<long, long> GetSize(void);
+	void CopyFrom(CostMap *cm);
+	float GetCost(long x, long y);
+	float SetCost(long x, long y, float score);
 
 	// Backtrack num_steps number of action steps, forwards or backwards.
 	int Step(int num_steps);

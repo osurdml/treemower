@@ -7,8 +7,6 @@ DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, 
 {
 	this->num_lookahead = num_lookahead;
 
-	total_score = 0.0;
-
 	// Add base vertex.
 	vx_t start_vx = boost::add_vertex(dTree);
 	dTree[start_vx].parent = 0;
@@ -27,8 +25,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
-	dTree[source_vx].state.score = Explore(dTree[source_vx].state, &future_states);
-	total_score += dTree[source_vx].state.score;   // TODO(yoos): What is this score?
+	Explore(&dTree[source_vx].state, &future_states);
 
 	long num_children = 0;
 
@@ -61,7 +58,7 @@ void DecisionTree::Prune(vx_t source_vx, vx_t exclude_vx)
 		// Create removal list. If we iterate over the edge iterator while
 		// removing edges, unhappy things happen.
 		std::list<Graph::edge_descriptor> rl;
-		for(; edges.first != edges.second; ++edges.first) {
+		for (; edges.first != edges.second; ++edges.first) {
 			rl.push_back(*edges.first);
 		}
 
@@ -107,7 +104,7 @@ float DecisionTree::Mow(void)
 		cm.Step(1);
 		// TODO(yoos): Clean this up.
 		std::vector<state_t> future_states;
-		dTree[current_vx].state.score = Explore(dTree[current_vx].state, &future_states);
+		Explore(&dTree[current_vx].state, &future_states);
 
 		// DEBUG
 		//cm.PrintDebug();
@@ -116,6 +113,6 @@ float DecisionTree::Mow(void)
 	std::cout << std::endl;
 	PrintDebug();
 
-	return total_score;
+	return dTree[current_vx].state.score;
 }
 

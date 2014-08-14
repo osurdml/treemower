@@ -7,26 +7,32 @@ StuntzHuntz::StuntzHuntz(const char *cm_filename, long rows, long cols, int look
 {
 }
 
-void StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score)
+long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score)
 {
 	state_t d = {{x, y}, score, 0};
 	states->push_back(d);
+
+	return 1;
 }
 
-float StuntzHuntz::Explore(state_t state, std::vector<state_t> *states)
+long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 {
-	long x = state.loc.x;
-	long y = state.loc.y;
+	long x = state->loc.x;
+	long y = state->loc.y;
+	long nc = 0;
 
-	float score = 0.0;
-	for(int i = -1; i < 2; i++)
-	{
-		for(int j = -1;j < 2; j++)
-		{
-			if(cm.getScore(x+i,y+j) >= 0 || (i != 0 && j != 0))
-				AddDecision(states,x+i,y+j,3);
+	state->score += 1;   // TODO(yoos): Increase or decrease score based on what we measure.
+
+	for (int i=-1; i<2; i++) {
+		for (int j=-1; j<2; j++) {
+			if (cm.GetCost(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
+				//std::cout << x+i << ", " << y+j << "\n";
+				nc += AddDecision(states,x+i,y+j,3);
+			}
 		}
 	}
+
+	return nc;
 }
 
 vx_t StuntzHuntz::FindBest(vx_t source_vx)

@@ -40,7 +40,6 @@ typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 class DecisionTree {
 	long num_lookahead;
 	vx_t current_vx;   // Current vertex.
-	float total_score;
 
 	/**
 	 * @brief Recursive depth-first lookahead.
@@ -91,8 +90,10 @@ protected:
 
 	/**
 	 * @brief State machine update functions.
+	 *
+	 * @return Number of possible future states.
 	 */
-	virtual float Explore(state_t, std::vector<state_t>*) = 0;
+	virtual long Explore(state_t*, std::vector<state_t>*) = 0;
 
 	/**
 	 * @brief Find the best vertex among immediate descendants of a given vertex.

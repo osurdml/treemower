@@ -10,8 +10,8 @@
 #include <boost/bind.hpp>
 
 class StuntzHuntz : public DecisionTree {
-	static void AddDecision(std::vector<state_t> *states, long x, long y, float score);
-	float Explore(state_t state, std::vector<state_t> *states);
+	static long AddDecision(std::vector<state_t> *states, long x, long y, float score);
+	long Explore(state_t *state, std::vector<state_t> *states);
 	vx_t FindBest(vx_t source_vx);
 
 public:
