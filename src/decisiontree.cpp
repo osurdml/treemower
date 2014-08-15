@@ -21,7 +21,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 	// DEBUG
 	//long x = dTree[source_vx].state.loc.x;
 	//long y = dTree[source_vx].state.loc.y;
-	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << cm.getScore(x,y) << "  ";
+	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << cm.GetCost(x,y) << "  \n";
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
@@ -29,7 +29,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 
 	long num_children = 0;
 
-	if (depth < num_lookahead) {
+	if (depth > 0) {
 		// Add all future states to graph.
 		for (std::vector<state_t>::iterator it=future_states.begin(); it!=future_states.end(); it++) {
 			vx_t new_vx = boost::add_vertex(dTree);
@@ -40,7 +40,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 
 			// Recurse on child.
 			cm.Step(1);
-			num_children += LookAhead(new_vx, depth+1) + 1;   // This child plus its children
+			num_children += LookAhead(new_vx, depth-1) + 1;   // This child plus its children
 			cm.Step(-1);
 		}
 	}
@@ -95,7 +95,7 @@ void DecisionTree::PrintDebug(void)
 
 float DecisionTree::Mow(void)
 {
-	while (LookAhead(current_vx, 0) > 0) {
+	while (LookAhead(current_vx, num_lookahead) > 0) {
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
 		current_vx = best_vx;

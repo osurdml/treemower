@@ -19,7 +19,7 @@ typedef boost::adjacency_list<boost::setS, boost::setS>::edge_descriptor edge_t;
  */
 struct state_t {
 	location_t loc;
-	float score;
+	float score;   // Cumulative score up to current state.
 	float depth;
 };
 
@@ -45,7 +45,7 @@ class DecisionTree {
 	 * @brief Recursive depth-first lookahead.
 	 *
 	 * @param source_vx Source vertex from which we begin the search.
-	 * @param depth Recursion depth. We should not exceed our maximum lookahead step value.
+	 * @param depth Remaining recursion depth.
 	 *
 	 * @return Number of descendants under the source vertex.
 	 */
