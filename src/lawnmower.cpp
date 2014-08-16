@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-Lawnmower::Lawnmower(const char *cm_filename, long rows, long cols, int lookahead) :
-	DecisionTree(cm_filename, rows, cols, lookahead)
+Lawnmower::Lawnmower(const char *im_filename, long rows, long cols, int lookahead) :
+	DecisionTree(im_filename, rows, cols, lookahead)
 {
 }
 
@@ -24,17 +24,17 @@ long Lawnmower::Explore(state_t *state, std::vector<state_t> *states)
 	// Calculate score at current location
 	state->score = 0;
 
-	if (cm.GetCost(x,y+1) > 0) {
+	if (im.score(x,y+1) > 0) {
 		// Up
 		//std::cout << "Up\n";
 		nc += AddDecision(states, x, y+1, state->score);
 	}
-	else if (cm.GetCost(x,y-1) > 0) {
+	else if (im.score(x,y-1) > 0) {
 		// Down
 		//std::cout << "Down\n";
 		nc += AddDecision(states, x, y-1, state->score);
 	}
-	else if (cm.GetCost(x+1,y) > 0) {
+	else if (im.score(x+1,y) > 0) {
 		// Across
 		//std::cout << "Across\n";
 		nc += AddDecision(states, x+1, y, state->score);
@@ -44,10 +44,10 @@ long Lawnmower::Explore(state_t *state, std::vector<state_t> *states)
 		//std::cout << "End\n";
 	}
 
-	cm.SetCost(x, y, 0);   // TODO(yoos): Use ScoreMap (or InfoMap, whatever) here.
+	im.set_score(x, y, 0);   // TODO(yoos): Use ScoreMap (or InfoMap, whatever) here.
 
 	// Debug
-	//cm.PrintDebug();
+	//im.PrintDebug();
 
 	return nc;
 }

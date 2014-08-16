@@ -1,7 +1,7 @@
 #ifndef DECISIONTREE_HPP
 #define DECISIONTREE_HPP
 
-#include <costmap.hpp>
+#include <infomap.hpp>
 
 #include <stdio.h>
 #include <vector>
@@ -69,7 +69,7 @@ class DecisionTree {
 	//std::list<vx_t> frontier;
 
 protected:
-	CostMap cm;
+	InfoMap im;
 
 	/**
 	 * @brief Directed graph of possible navigation plans.
@@ -111,7 +111,7 @@ public:
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
 	 * @param fg Instance of a FrontierGenerator whose update function we will call.
 	 */
-	DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, long num_lookahead);
+	DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead);
 
 	/**
 	 * @brief Runs treemower.

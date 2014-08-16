@@ -2,8 +2,8 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(const char *cm_filename, long cm_rows, long cm_cols, long num_lookahead) :
-	cm(cm_filename, cm_rows, cm_cols, num_lookahead)
+DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead) :
+	im(im_filename, im_filename, im_filename, im_filename, im_rows, im_cols, num_lookahead)   // TODO(yoos): Actually use separate data
 {
 	this->num_lookahead = num_lookahead;
 
@@ -21,7 +21,7 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 	// DEBUG
 	//long x = dTree[source_vx].state.loc.x;
 	//long y = dTree[source_vx].state.loc.y;
-	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << cm.GetCost(x,y) << "  \n";
+	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << im.GetCost(x,y) << "  \n";
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
@@ -39,9 +39,9 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 			dTree[new_edge].action = 0;   // TODO(yoos)
 
 			// Recurse on child.
-			cm.Step(1);
+			im.Step(1);
 			num_children += LookAhead(new_vx, depth-1) + 1;   // This child plus its children
-			cm.Step(-1);
+			im.Step(-1);
 		}
 	}
 
@@ -101,13 +101,13 @@ float DecisionTree::Mow(void)
 		current_vx = best_vx;
 
 		// Step costmap forward.
-		cm.Step(1);
+		im.Step(1);
 		// TODO(yoos): Clean this up.
 		std::vector<state_t> future_states;
 		Explore(&dTree[current_vx].state, &future_states);
 
 		// DEBUG
-		//cm.PrintDebug();
+		//im.PrintDebug();
 	}
 
 	std::cout << std::endl;

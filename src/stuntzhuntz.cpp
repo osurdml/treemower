@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-StuntzHuntz::StuntzHuntz(const char *cm_filename, long rows, long cols, int lookahead) :
-	DecisionTree(cm_filename, rows, cols, lookahead)
+StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, int lookahead) :
+	DecisionTree(im_filename, rows, cols, lookahead)
 {
 }
 
@@ -25,7 +25,7 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 
 	for (int i=-1; i<2; i++) {
 		for (int j=-1; j<2; j++) {
-			if (cm.GetCost(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
+			if (im.depth(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
 				//std::cout << x+i << ", " << y+j << "\n";
 				nc += AddDecision(states,x+i,y+j,3);
 			}
