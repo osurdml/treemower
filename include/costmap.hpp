@@ -1,22 +1,12 @@
 #ifndef COSTMAP_HPP
 #define COSTMAP_HPP
 
+#include <basemap.hpp>
+
 #include <stdlib.h>
-#include <stdio.h>
-#include <fstream>
 #include <vector>
 
-#include <Eigen/Dense>
-
-using namespace Eigen;
-
-struct location_t {
-	long x;
-	long y;
-};
-
-class CostMap {
-	// TODO(yoos): Make dynamic? Multi-layer?
+class CostMap : public BaseMap {
 	long max_lookahead;
 	MatrixXf m_orig;
 	std::vector<MatrixXf> ms;   // Working copies of the costmap.

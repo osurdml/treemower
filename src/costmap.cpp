@@ -1,33 +1,12 @@
 #include <costmap.hpp>
 
 #include <iostream>
-#include <fstream>
 #include <iomanip>
 
 CostMap::CostMap(const char *cm_filename, long rows, long cols, long lookahead)
 {
 	max_lookahead = lookahead;
-	m_orig.resize(rows, cols);
-
-	// Open input file
-	std::ifstream cm(cm_filename);
-	if (!cm)
-	{
-		std::cerr << "Failed to open file " << cm_filename << std::endl;
-	}
-
-	// Read file
-	std::string line;
-	std::string field;
-	for (int i=0; i<rows; i++) {
-		std::getline(cm, line);
-		std::istringstream s(line);
-		for (int j=0; j<cols; j++) {
-			std::getline(s, field,',');
-			m_orig(i, j) = std::atof(field.c_str());
-		}
-	}
-	cm.close();
+	ImportMatrix(cm_filename, &m_orig, rows, cols);
 
 	// Set up undo buffer.
 	for (int i=0; i<lookahead+1; i++) {
