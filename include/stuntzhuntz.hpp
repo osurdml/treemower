@@ -14,6 +14,16 @@ class StuntzHuntz : public DecisionTree {
 	long Explore(state_t *state, std::vector<state_t> *states);
 	vx_t FindBest(vx_t source_vx);
 
+	/**
+	 * @brief Depreciate cost in and around visited location.
+	 *
+	 * Should be run once inside Explore() after all decisions have been generated.
+	 *
+	 * @param x X coordinate.
+	 * @param y Y coordinate.
+	 */
+	void _UpdateCost(long x, long y);
+
 public:
 	StuntzHuntz(const char *im_filename, long rows, long cols, int lookahead);
 };
