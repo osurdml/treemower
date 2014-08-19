@@ -33,10 +33,11 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 		// Add all future states to graph.
 		for (std::vector<state_t>::iterator it=future_states.begin(); it!=future_states.end(); it++) {
 			vx_t new_vx = boost::add_vertex(dTree);
-			edge_t new_edge = boost::add_edge(source_vx, new_vx, dTree).first;
+			boost::add_edge(source_vx, new_vx, dTree);
 			dTree[new_vx].parent = source_vx;
 			dTree[new_vx].state = *it;
-			dTree[new_edge].action = 0;   // TODO(yoos)
+			//edge_t new_edge = boost::add_edge(source_vx, new_vx, dTree).first;
+			//dTree[new_edge].action = 0;   // TODO(yoos)
 
 			// Recurse on child.
 			im.Step(1);

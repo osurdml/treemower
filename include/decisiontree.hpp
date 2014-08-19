@@ -23,7 +23,7 @@ struct state_t {
 	float depth;
 };
 
-typedef boost::function<int (state_t state, std::vector<state_t> *states)> action_t;
+//typedef boost::function<int (state_t state, std::vector<state_t> *states)> action_t;
 
 struct vx_property {
 	vx_t parent;
@@ -31,7 +31,7 @@ struct vx_property {
 };
 
 struct edge_property {
-	action_t action;
+	//action_t action;
 };
 
 typedef boost::adjacency_list<boost::setS, boost::setS, boost::directedS, vx_property, edge_property> Graph;
@@ -63,10 +63,6 @@ class DecisionTree {
 	 * @brief Debug
 	 */
 	void PrintDebug(void);
-	// vx_t BreakTie(vector<vx_t> v);
-
-	// frontier vertices. TODO(yoos): list probably isn't the best type to use here.
-	//std::list<vx_t> frontier;
 
 protected:
 	InfoMap im;
@@ -108,8 +104,10 @@ public:
 	/**
 	 * @brief Constructor.
 	 *
+	 * @param im_filename Filename of CSV-formatted data to use as InfoMap.
+	 * @param im_rows Number of rows to parse.
+	 * @param im_rows Number of columns to parse.
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
-	 * @param fg Instance of a FrontierGenerator whose update function we will call.
 	 */
 	DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead);
 
