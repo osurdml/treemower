@@ -100,6 +100,24 @@ protected:
 	 */
 	virtual vx_t FindBest(vx_t source_vx) = 0;
 
+	/**
+	 * @brief Calculate score based on current state.
+	 *
+	 * @param state Current state.
+	 *
+	 * @return Score.
+	 */
+	float CalcScore(const state_t *state);
+
+	/**
+	 * @brief Depreciate score in and around visited location.
+	 *
+	 * Should be run once inside Explore() after all decisions have been generated.
+	 *
+	 * @param state Current state.
+	 */
+	void DepreciateScore(const state_t *state);
+
 public:
 	/**
 	 * @brief Constructor.
