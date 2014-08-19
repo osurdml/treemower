@@ -102,7 +102,9 @@ float DecisionTree::Mow(void)
 
 		// Step costmap forward.
 		im.Step(1);
-		// TODO(yoos): Clean this up.
+		// TODO(yoos): Clean this up. This runs whatever the user wants to
+		// change about our current state and obviously disregards the
+		// generated future states.
 		std::vector<state_t> future_states;
 		Explore(&dTree[current_vx].state, &future_states);
 

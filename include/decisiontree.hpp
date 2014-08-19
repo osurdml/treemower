@@ -77,30 +77,30 @@ protected:
 	 * Each edge represents an action, and each vertex represents (via the
 	 * sequence of edges up to that vertex) a navigation plan composed of state
 	 * transitions.
-	 * 
-	 * Obviously, this will grow exponentially. So we only make num_lookahead
-	 * decisions ahead of our current state, recording the cost to each vertex.
-	 * We then choose the best, take one step towards the best-cost target, and
-	 * discard all other branches.
-	 * 
-	 * Hopefully we'll be able to find a point of diminishing returns with some
-	 * num_lookahead value.
 	 */
 	Graph dTree;
 
 	/**
-	 * @brief State machine update functions.
+	 * @brief "Explore" out from the location given by the current state.
+	 *
+	 * Generate new possible states to which we could transition. Each
+	 * generated state should include an updated cost, i.e., the current score
+	 * combined with a gain or loss in utility provided by that future
+	 * generated state.
+	 *
+	 * @param state Current state. TODO(yoos): Decide if this should be mutable.
+	 * @param states Vector that should be populated with possible future states.
 	 *
 	 * @return Number of possible future states.
 	 */
-	virtual long Explore(state_t*, std::vector<state_t>*) = 0;
+	virtual long Explore(state_t *state, std::vector<state_t> *states) = 0;
 
 	/**
 	 * @brief Find the best vertex among immediate descendants of a given vertex.
 	 *
 	 * @param source_vx Source vertex.
 	 *
-	 * @return Best vertex.
+	 * @return Best vertex. What is "best" is discretionary.
 	 */
 	virtual vx_t FindBest(vx_t source_vx) = 0;
 
@@ -115,6 +115,14 @@ public:
 
 	/**
 	 * @brief Runs treemower.
+	 *
+	 * Make num_lookahead mock decisions ahead of our current state, keeping
+	 * track of the total score in a state associated with each vertex. We then
+	 * choose the best, discard all other branches, and take one step towards
+	 * the best target.
+	 *
+	 * Hopefully we'll be able to find a point of diminishing returns with some
+	 * num_lookahead value.
 	 *
 	 * @return The score
 	 */
