@@ -3,7 +3,8 @@ OUTPUT=treemower
 OUTPUT_DIR=.
 
 # Source Files
-SOURCES = main.cpp basemap.cpp costmap.cpp decisiontree.cpp infomap.cpp lawnmower.cpp stuntzhuntz.cpp
+SOURCES = main.cpp basemap.cpp costmap.cpp decisiontree.cpp infomap.cpp
+SOURCES += lawnmower.cpp stuntzhuntz.cpp
 SRCDIR = src
 INCLUDE_DIRS = include /usr/include/eigen3
 OBJDIR = build
