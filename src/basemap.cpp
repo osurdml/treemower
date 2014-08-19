@@ -44,7 +44,7 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<Matr
 	ret_size = ImportMatrix(mat_fn, &m, rows, cols);
 
 	// Set up undo buffer.
-	for (int i=0; i<max_undo; i++) {
+	for (int i=0; i<max_undo+1; i++) {
 		ms->push_back(MatrixXf(m));
 	}
 	idx_undo = max_undo;
@@ -97,7 +97,7 @@ int BaseMap::Step(int num_steps)
 			idx_undo = (idx_undo+num_steps) % (max_undo+1);
 
 			// Copy matrix
-			(*it)[idx_undo] = (*it)[idx_prev];
+			(**it)[idx_undo] = (**it)[idx_prev];
 
 			num_remaining_undos += num_steps;
 			if (num_remaining_undos > max_undo) {
