@@ -131,7 +131,7 @@ void DecisionTree::DepreciateScore(const state_t *state)
 
 float DecisionTree::Mow(void)
 {
-	for (int i=0; i<50; i++) {
+	for (int i=0; i<1000; i++) {
 		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
@@ -145,18 +145,16 @@ float DecisionTree::Mow(void)
 		std::vector<state_t> future_states;
 		Explore(&dTree[current_vx].state, &future_states);
 
-		state_t *s = &dTree[current_vx].state;
-		std::cout << "(" << s->loc.x << ", " << s->loc.y << "): " << s->score << "\n";
-		//im.PrintDebug();
-
-		usleep(100000);
-
 		// DEBUG
+		//state_t *s = &dTree[current_vx].state;
+		//std::cout << "(" << s->loc.x << ", " << s->loc.y << "): " << s->score << "\n";
 		//im.PrintDebug();
+
+		//usleep(100000);
 	}
 
 	std::cout << std::endl;
-	PrintDebug();
+	//PrintDebug();
 
 	return dTree[current_vx].state.score;
 }
