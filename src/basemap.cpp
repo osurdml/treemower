@@ -94,7 +94,6 @@ int BaseMap::MatrixSet(std::vector<MatrixXf> *m, long x, long y, float val)
 
 int BaseMap::Step(int num_steps)
 {
-	// TODO(yoos): Use min/max function.
 	if (num_steps > 0) {
 		// Unconditionally step forward, possibly losing some history.
 		long idx_prev = idx_undo;
@@ -105,10 +104,7 @@ int BaseMap::Step(int num_steps)
 			(**it)[idx_undo] = (**it)[idx_prev];
 		}
 
-		num_remaining_undos += num_steps;
-		if (num_remaining_undos > max_undo) {
-			num_remaining_undos = max_undo;
-		}
+		num_remaining_undos = std::min(num_remaining_undos+num_steps, max_undo);
 	}
 	else {
 		// Step backward if enough undos are available.
