@@ -5,6 +5,7 @@
 
 InfoMap::InfoMap(const char *score_fn, const char *depth_fn, const char *temperature_fn, const char *oxygen_fn, long rows, long cols, long num_lookahead)
 {
+	_size = ImportMatrix(0, &_visited, rows, cols, num_lookahead);
 	_size = ImportMatrix(score_fn, &_score, rows, cols, num_lookahead);
 
 	_size = ImportMatrix(depth_fn, &_depth, rows, cols);
@@ -15,6 +16,16 @@ InfoMap::InfoMap(const char *score_fn, const char *depth_fn, const char *tempera
 std::pair<long, long> InfoMap::size(void) const
 {
 	return _size;
+}
+
+float InfoMap::visited(long x, long y) const
+{
+	return MatrixGet(&_visited, x, y);
+}
+
+int InfoMap::visit(long x, long y)
+{
+	return MatrixSet(&_visited, x, y, MatrixGet(&_visited,x,y)+1);
 }
 
 float InfoMap::score(long x, long y) const
@@ -59,10 +70,10 @@ int InfoMap::set_oxygen(long x, long y, float val)
 
 void InfoMap::PrintDebug(void)
 {
-	for (int i=0; i<size().first; i++) {
+	for (int i=-1; i<size().first+1; i++) {
 		std::cout << "\n  ";
-		for (int j=0; j<size().second; j++) {
-			std::cout << std::setw(8) << depth(i, j) << " ";
+		for (int j=-1; j<size().second+1; j++) {
+			std::cout << std::setw(8) << score(i, j) << " ";
 		}
 	}
 	std::cout << "\n";
