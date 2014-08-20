@@ -21,15 +21,18 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 	// DEBUG
 	//long x = dTree[source_vx].state.loc.x;
 	//long y = dTree[source_vx].state.loc.y;
-	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << im.GetCost(x,y) << "  \n";
+	//std::cout << "LookAhead() depth: " << depth << "  (" << x << ", " << y << ")  score: " << im.score(x,y) << "  \n";
+
+	// Use new map.
+	im.Step(1);
 
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
 	Explore(&dTree[source_vx].state, &future_states);
 
+	// Recurse on children.
 	long num_children = 0;
-
-	if (depth > 0) {
+	if (depth > 1) {
 		// Add all future states to graph.
 		for (std::vector<state_t>::iterator it=future_states.begin(); it!=future_states.end(); it++) {
 			vx_t new_vx = boost::add_vertex(dTree);
@@ -39,12 +42,12 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 			//edge_t new_edge = boost::add_edge(source_vx, new_vx, dTree).first;
 			//dTree[new_edge].action = 0;   // TODO(yoos)
 
-			// Recurse on child.
-			im.Step(1);
 			num_children += LookAhead(new_vx, depth-1) + 1;   // This child plus its children
-			im.Step(-1);
 		}
 	}
+
+	// Revert to old map.
+	im.Step(-1);
 
 	return num_children;
 }
@@ -138,6 +141,12 @@ float DecisionTree::Mow(void)
 		// generated future states.
 		std::vector<state_t> future_states;
 		Explore(&dTree[current_vx].state, &future_states);
+
+		state_t *s = &dTree[current_vx].state;
+		std::cout << "\n\n(" << s->loc.x << ", " << s->loc.y << "): " << s->score << "\n";
+		im.PrintDebug();
+
+		usleep(100000);
 
 		// DEBUG
 		//im.PrintDebug();
