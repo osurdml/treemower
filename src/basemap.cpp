@@ -53,7 +53,7 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<Matr
 		ms->push_back(MatrixXf(m));
 	}
 	idx_undo = max_undo;
-	num_remaining_undos = max_undo;
+	num_remaining_undos = 0;
 
 	return ret_size;
 }
@@ -95,32 +95,31 @@ int BaseMap::MatrixSet(std::vector<MatrixXf> *m, long x, long y, float val)
 int BaseMap::Step(int num_steps)
 {
 	// TODO(yoos): Use min/max function.
-	for (std::vector<std::vector<MatrixXf>*>::iterator it=undo_matrices.begin(); it!=undo_matrices.end(); it++) {
-		if (num_steps > 0) {
-			// Unconditionally step forward, possibly losing some history.
-			long idx_prev = idx_undo;
-			idx_undo = (idx_undo+num_steps) % (max_undo+1);
+	if (num_steps > 0) {
+		// Unconditionally step forward, possibly losing some history.
+		long idx_prev = idx_undo;
+		idx_undo = (idx_undo+num_steps) % (max_undo+1);
 
-			// Copy matrix
+		// Copy matrices
+		for (std::vector<std::vector<MatrixXf>*>::iterator it=undo_matrices.begin(); it!=undo_matrices.end(); it++) {
 			(**it)[idx_undo] = (**it)[idx_prev];
-
-			num_remaining_undos += num_steps;
-			if (num_remaining_undos > max_undo) {
-				num_remaining_undos = max_undo;
-			}
 		}
-		else {
-			// Step backward if enough undos are available.
-			if (num_remaining_undos > num_steps) {
-				idx_undo = (idx_undo+max_undo+1+num_steps) % (max_undo+1);
-				num_remaining_undos += num_steps;
-			}
-			else {
-				return 0;
-			}
+
+		num_remaining_undos += num_steps;
+		if (num_remaining_undos > max_undo) {
+			num_remaining_undos = max_undo;
 		}
 	}
-	//std::cout << "Step: " << num_steps << "  m_current: " << m_current << "\n";
+	else {
+		// Step backward if enough undos are available.
+		if (num_remaining_undos + num_steps >= 0) {
+			idx_undo = (idx_undo+max_undo+1+num_steps) % (max_undo+1);
+			num_remaining_undos += num_steps;
+		}
+		else {
+			return 0;
+		}
+	}
 	return num_steps;
 }
 
