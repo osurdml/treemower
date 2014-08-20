@@ -21,27 +21,28 @@ long Lawnmower::Explore(state_t *state, std::vector<state_t> *states)
 	long y = state->loc.y;
 	long nc = 0;
 
-	if (im.score(x,y+1) > 0) {
+	if (im.visited(x,y+1) == 0) {
 		// Up
 		//std::cout << "Up\n";
-		nc += AddDecision(states, x, y+1, state->score+im.score(x,y+1));
+		nc += AddDecision(states, x, y+1, CalcScore(state));
 	}
-	else if (im.score(x,y-1) > 0) {
+	else if (im.visited(x,y-1) == 0) {
 		// Down
 		//std::cout << "Down\n";
-		nc += AddDecision(states, x, y-1, state->score+im.score(x,y-1));
+		nc += AddDecision(states, x, y-1, CalcScore(state));
 	}
-	else if (im.score(x+1,y) > 0) {
+	else if (im.visited(x+1,y) == 0) {
 		// Across
 		//std::cout << "Across\n";
-		nc += AddDecision(states, x+1, y, state->score+im.score(x+1,y));
+		nc += AddDecision(states, x+1, y, CalcScore(state));
 	}
 	else {
 		// End
 		//std::cout << "End\n";
 	}
 
-	im.set_score(x, y, 0);   // Don't return here.
+	im.visit(x,y);
+	DepreciateScore(state);
 
 	// Debug
 	//im.PrintDebug();
