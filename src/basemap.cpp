@@ -8,6 +8,11 @@ BaseMap::BaseMap(void)
 
 std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, long rows, long cols)
 {
+	if (mat_fn == 0) {
+		(*m) = MatrixXf::Zero(rows, cols);
+		return std::pair<long, long>(rows, cols);
+	}
+
 	(*m).resize(rows, cols);
 
 	// Open input file
