@@ -26,6 +26,9 @@ int main(int argc, char **argv)
 	printf("Lawn score: %f\n", lm.Mow());
 	printf("RH score: %f\n", sh.Mow());
 
+	lm.Export("output/lm.out");
+	sh.Export("output/sh.out");
+
 	return 0;
 }
 

@@ -143,6 +143,11 @@ public:
 	 * @return The score
 	 */
 	float Mow(void);
+
+	/**
+	 * @brief Export data.
+	 */
+	void Export(const char *out_filename);
 };
 
 #endif // DECISIONTREE_HPP

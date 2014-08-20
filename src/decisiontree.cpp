@@ -1,5 +1,7 @@
 #include <decisiontree.hpp>
 
+#include <fstream>
+
 #include <boost/bind.hpp>
 
 DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead) :
@@ -157,5 +159,29 @@ float DecisionTree::Mow(void)
 	//PrintDebug();
 
 	return dTree[current_vx].state.score;
+}
+
+void DecisionTree::Export(const char *out_filename)
+{
+	// Open output file
+	std::ofstream ofs(out_filename);
+	if (!ofs)
+	{
+		std::cerr << "Failed to open file " << out_filename << std::endl;
+	}
+
+	std::cout << "Graph contains " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
+
+	// Write to file.
+	vx_t print_vx = current_vx;
+	location_t loc = dTree[current_vx].state.loc;
+	while (dTree[print_vx].parent != 0) {
+		ofs << loc.x << "," << loc.y << "\n";
+		print_vx = dTree[print_vx].parent;
+		loc = dTree[print_vx].state.loc;
+	}
+	ofs << loc.x << "," << loc.y << "\n";   // TODO(yoos): Remove redundancy.
+
+	ofs.close();
 }
 
