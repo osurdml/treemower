@@ -5,14 +5,20 @@
 StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, int lookahead) :
 	DecisionTree(im_filename, rows, cols, lookahead)
 {
+	srand(0);
 }
 
 long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score)
 {
-	state_t d = {{x, y}, score, 0};
-	states->push_back(d);
+	const int CHOICE_PER = 100;   // Probability in percent that a generated decision will be added to future states.
 
-	return 1;
+	if ((rand() % 100) < CHOICE_PER) {
+		state_t d = {{x, y}, score, 0};
+		states->push_back(d);
+		return 1;
+	}
+
+	return 0;
 }
 
 long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
@@ -27,14 +33,14 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 			if (im.depth(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
 				//std::cout << x+i << ", " << y+j << "\n";
 				if (im.score(x+i, y+j) >= 0.1) {   // TODO(yoos): Arbitrary threshold of 0.1
-					nc += AddDecision(states, x+i, y+j, state->score+im.score(x+i, y+j));
+					nc += AddDecision(states, x+i, y+j, CalcScore(state));
 				}
 			}
 		}
 	}
 
 	// Depreciate cost in and around visited location.
-	_UpdateCost(x, y);
+	DepreciateScore(state);
 
 	return nc;
 }
@@ -57,18 +63,5 @@ vx_t StuntzHuntz::FindBest(vx_t source_vx)
 	}
 
 	return best_vx;
-}
-
-void StuntzHuntz::_UpdateCost(long x, long y)
-{
-	const float REDUCE_PER = 0.5;
-
-	// Reduce score of this cell and some surrounding cells.
-	im.set_score(x,y,   REDUCE_PER * im.score(x,y));
-	im.set_score(x,y+1, REDUCE_PER * im.score(x,y+1));
-	im.set_score(x,y-1, REDUCE_PER * im.score(x,y-1));
-	im.set_score(x+1,y, REDUCE_PER * im.score(x+1,y));
-	im.set_score(x-1,y, REDUCE_PER * im.score(x-1,y));
-	// TODO(yoos): Yawei should elaborate.
 }
 
