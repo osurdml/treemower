@@ -102,12 +102,14 @@ float DecisionTree::CalcScore(const state_t *state)
 	long x = state->loc.x;
 	long y = state->loc.y;
 
+	// This assumes BaseMap::score() returns -1 if coordinates are invalid, in
+	// which case we ignore the score.
 	float s = state->score +
-		im.score(x, y) +
-		im.score(x, y+1) +
-		im.score(x, y-1) +
-		im.score(x+1, y) +
-		im.score(x-1, y);
+		std::max(0.0f, im.score(x, y)) +
+		std::max(0.0f, im.score(x, y+1)) +
+		std::max(0.0f, im.score(x, y-1)) +
+		std::max(0.0f, im.score(x+1, y)) +
+		std::max(0.0f, im.score(x-1, y));
 
 	return s;
 }
