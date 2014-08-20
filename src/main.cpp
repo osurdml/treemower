@@ -17,9 +17,9 @@ int main(int argc, char **argv)
 
 	// Get costmap file.
 	const char *cm_filename = argv[1];
-	long rows = 7;
-	long cols = 4;
-	int lookahead = 4;
+	long rows = 100;
+	long cols = 100;
+	int lookahead = 2;
 	Lawnmower lm(cm_filename, rows, cols, lookahead);
 	StuntzHuntz sh(cm_filename, rows, cols, lookahead);
 
