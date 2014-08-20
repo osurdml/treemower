@@ -30,18 +30,18 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 	std::vector<state_t> future_states;
 	Explore(&dTree[source_vx].state, &future_states);
 
-	// Recurse on children.
 	long num_children = 0;
-	if (depth > 1) {
-		// Add all future states to graph.
-		for (std::vector<state_t>::iterator it=future_states.begin(); it!=future_states.end(); it++) {
-			vx_t new_vx = boost::add_vertex(dTree);
-			boost::add_edge(source_vx, new_vx, dTree);
-			dTree[new_vx].parent = source_vx;
-			dTree[new_vx].state = *it;
-			//edge_t new_edge = boost::add_edge(source_vx, new_vx, dTree).first;
-			//dTree[new_edge].action = 0;   // TODO(yoos)
+	// Add all future states to graph.
+	for (std::vector<state_t>::iterator it=future_states.begin(); it!=future_states.end(); it++) {
+		vx_t new_vx = boost::add_vertex(dTree);
+		boost::add_edge(source_vx, new_vx, dTree);
+		dTree[new_vx].parent = source_vx;
+		dTree[new_vx].state = *it;
+		//edge_t new_edge = boost::add_edge(source_vx, new_vx, dTree).first;
+		//dTree[new_edge].action = 0;   // TODO(yoos)
 
+		// Recurse on child.
+		if (depth > 1) {
 			num_children += LookAhead(new_vx, depth-1) + 1;   // This child plus its children
 		}
 	}
@@ -131,7 +131,8 @@ void DecisionTree::DepreciateScore(const state_t *state)
 
 float DecisionTree::Mow(void)
 {
-	while (LookAhead(current_vx, num_lookahead) > 0) {
+	for (int i=0; i<50; i++) {
+		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
 		current_vx = best_vx;
@@ -145,8 +146,8 @@ float DecisionTree::Mow(void)
 		Explore(&dTree[current_vx].state, &future_states);
 
 		state_t *s = &dTree[current_vx].state;
-		std::cout << "\n\n(" << s->loc.x << ", " << s->loc.y << "): " << s->score << "\n";
-		im.PrintDebug();
+		std::cout << "(" << s->loc.x << ", " << s->loc.y << "): " << s->score << "\n";
+		//im.PrintDebug();
 
 		usleep(100000);
 
