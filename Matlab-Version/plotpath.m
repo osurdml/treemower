@@ -1,8 +1,8 @@
 clear
 close all
-scoremap = csvread('scoremap.csv');
-M1 = csvread('lm.out');
-M2 = csvread('sh.out');
+scoremap = csvread('../data/costmap2.txt');
+M1 = csvread('../output/lm.out');
+M2 = csvread('../output/sh.out');
 x1 = M1(:,1);
 y1 = M1(:,2);
 x2 = M2(:,1);
