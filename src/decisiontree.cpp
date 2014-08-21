@@ -129,11 +129,18 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	im.set_score(x,y-1, REDUCE_PER * im.score(x,y-1));
 	im.set_score(x+1,y, REDUCE_PER * im.score(x+1,y));
 	im.set_score(x-1,y, REDUCE_PER * im.score(x-1,y));
+
+	// Maybe depreciate more cells?
+	//for (int i=-1; i<2; i++) {
+	//	for (int j=-1; j<2; j++) {
+	//		im.set_score(x+i,y+j,   REDUCE_PER * im.score(x+i,y+j));
+	//	}
+	//}
 }
 
 float DecisionTree::Mow(void)
 {
-	for (int i=0; i<1000; i++) {
+	for (int i=0; i<4000; i++) {
 		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
@@ -153,6 +160,7 @@ float DecisionTree::Mow(void)
 		//im.PrintDebug();
 
 		//usleep(100000);
+		std::cout << ".";
 	}
 
 	std::cout << std::endl;
