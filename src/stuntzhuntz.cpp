@@ -32,9 +32,7 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 		for (int j=-1; j<2; j++) {
 			if (im.depth(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
 				//std::cout << x+i << ", " << y+j << "\n";
-				if (im.score(x+i, y+j) >= 0.1) {   // TODO(yoos): Arbitrary threshold of 0.1
-					nc += AddDecision(states, x+i, y+j, CalcScore(state));
-				}
+				nc += AddDecision(states, x+i, y+j, CalcScore(state));
 			}
 		}
 	}
