@@ -20,8 +20,8 @@ int main(int argc, char **argv)
 	long rows = 100;
 	long cols = 100;
 	int lookahead = 2;
-	Lawnmower lm(cm_filename, rows, cols, lookahead);
-	StuntzHuntz sh(cm_filename, rows, cols, lookahead);
+	Lawnmower lm(cm_filename, rows, cols, lookahead, 4000);
+	StuntzHuntz sh(cm_filename, rows, cols, lookahead, 4000);
 
 	printf("Lawn score: %f\n", lm.Mow());
 	printf("RH score: %f\n", sh.Mow());

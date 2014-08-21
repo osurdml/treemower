@@ -20,7 +20,7 @@ typedef boost::adjacency_list<boost::setS, boost::setS>::edge_descriptor edge_t;
 struct state_t {
 	location_t loc;
 	float score;   // Cumulative score up to current state.
-	float depth;
+	float budget;
 };
 
 //typedef boost::function<int (state_t state, std::vector<state_t> *states)> action_t;
@@ -126,8 +126,9 @@ public:
 	 * @param im_rows Number of rows to parse.
 	 * @param im_rows Number of columns to parse.
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
+	 * @param budget Transport budget.
 	 */
-	DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead);
+	DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead, float budget);
 
 	/**
 	 * @brief Runs treemower.

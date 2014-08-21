@@ -4,7 +4,7 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead) :
+DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead, float budget) :
 	im(im_filename, im_filename, im_filename, im_filename, im_rows, im_cols, num_lookahead)   // TODO(yoos): Actually use separate data
 {
 	this->num_lookahead = num_lookahead;
@@ -14,6 +14,8 @@ DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, 
 	dTree[start_vx].parent = 0;
 	dTree[start_vx].state.loc.x = 0;
 	dTree[start_vx].state.loc.y = 0;
+	dTree[start_vx].state.score = 0;
+	dTree[start_vx].state.budget = budget;
 	current_vx = start_vx;
 	//frontier.push_back(current_vx);
 }
@@ -140,7 +142,7 @@ void DecisionTree::DepreciateScore(const state_t *state)
 
 float DecisionTree::Mow(void)
 {
-	for (int i=0; i<4000; i++) {
+	while (dTree[current_vx].state.budget > 0) {
 		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx

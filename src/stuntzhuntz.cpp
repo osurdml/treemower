@@ -2,18 +2,18 @@
 
 #include <stdio.h>
 
-StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, int lookahead) :
-	DecisionTree(im_filename, rows, cols, lookahead)
+StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget) :
+	DecisionTree(im_filename, rows, cols, lookahead, budget)
 {
 	srand(0);
 }
 
-long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score)
+long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score, float budget)
 {
 	const int CHOICE_PER = 100;   // Probability in percent that a generated decision will be added to future states.
 
 	if ((rand() % 100) < CHOICE_PER) {
-		state_t d = {{x, y}, score, 0};
+		state_t d = {{x, y}, score, budget};
 		states->push_back(d);
 		return 1;
 	}
@@ -32,7 +32,7 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 		for (int j=-1; j<2; j++) {
 			if (im.depth(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
 				//std::cout << x+i << ", " << y+j << "\n";
-				nc += AddDecision(states, x+i, y+j, CalcScore(state));
+				nc += AddDecision(states, x+i, y+j, CalcScore(state), state->budget-std::sqrt(std::pow(i,2)+std::pow(j,2)));
 			}
 		}
 	}

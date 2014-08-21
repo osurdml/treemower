@@ -2,14 +2,14 @@
 
 #include <stdio.h>
 
-Lawnmower::Lawnmower(const char *im_filename, long rows, long cols, int lookahead) :
-	DecisionTree(im_filename, rows, cols, lookahead)
+Lawnmower::Lawnmower(const char *im_filename, long rows, long cols, long lookahead, float budget) :
+	DecisionTree(im_filename, rows, cols, lookahead, budget)
 {
 }
 
-long Lawnmower::AddDecision(std::vector<state_t> *states, long x, long y, float score)
+long Lawnmower::AddDecision(std::vector<state_t> *states, long x, long y, float score, float budget)
 {
-	state_t d = {{x, y}, score, 0};
+	state_t d = {{x, y}, score, budget};
 	states->push_back(d);
 
 	return 1;
@@ -24,17 +24,17 @@ long Lawnmower::Explore(state_t *state, std::vector<state_t> *states)
 	if (im.visited(x,y+1) == 0) {
 		// Up
 		//std::cout << "Up\n";
-		nc += AddDecision(states, x, y+1, CalcScore(state));
+		nc += AddDecision(states, x, y+1, CalcScore(state), state->budget-1);
 	}
 	else if (im.visited(x,y-1) == 0) {
 		// Down
 		//std::cout << "Down\n";
-		nc += AddDecision(states, x, y-1, CalcScore(state));
+		nc += AddDecision(states, x, y-1, CalcScore(state), state->budget-1);
 	}
 	else if (im.visited(x+1,y) == 0) {
 		// Across
 		//std::cout << "Across\n";
-		nc += AddDecision(states, x+1, y, CalcScore(state));
+		nc += AddDecision(states, x+1, y, CalcScore(state), state->budget-1);
 	}
 	else {
 		// End
