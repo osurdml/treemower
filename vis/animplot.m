@@ -13,7 +13,7 @@ function exitcode = animplot(scoremap_fn, path_fn)
 	ylabel('Y');
 
 	TOTAL_POINTS = size(x);
-	for i=TOTAL_POINTS-1:-1:1
+	for i=1:1:TOTAL_POINTS-1
 		px1 = x(i)+1;
 		py1 = y(i)+1;
 		px2 = x(i+1)+1;
