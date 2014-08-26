@@ -4,16 +4,21 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead) :
+DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead, float budget, float rand_frac) :
 	im(im_filename, im_filename, im_filename, im_filename, im_rows, im_cols, num_lookahead)   // TODO(yoos): Actually use separate data
 {
+	srand(3);
+
 	this->num_lookahead = num_lookahead;
+	this->random_choice_frac = rand_frac;
 
 	// Add base vertex.
 	vx_t start_vx = boost::add_vertex(dTree);
 	dTree[start_vx].parent = 0;
 	dTree[start_vx].state.loc.x = 0;
 	dTree[start_vx].state.loc.y = 0;
+	dTree[start_vx].state.score = 0;
+	dTree[start_vx].state.budget = budget;
 	current_vx = start_vx;
 	//frontier.push_back(current_vx);
 }
@@ -31,6 +36,12 @@ long DecisionTree::LookAhead(vx_t source_vx, long depth)
 	// Run algorithm. This will generate child vertices and update the costmap.
 	std::vector<state_t> future_states;
 	Explore(&dTree[source_vx].state, &future_states);
+
+	// Randomly remove some, but not all, future states.
+	long num_remove = std::min((long) future_states.size()-1, (long) ((1-random_choice_frac)*future_states.size()));
+	for (int i=0; i<num_remove; i++) {
+		future_states.erase(future_states.begin() + (rand() % future_states.size()));
+	}
 
 	long num_children = 0;
 	// Add all future states to graph.
@@ -140,7 +151,7 @@ void DecisionTree::DepreciateScore(const state_t *state)
 
 float DecisionTree::Mow(void)
 {
-	for (int i=0; i<4000; i++) {
+	while (dTree[current_vx].state.budget > 0) {
 		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);
 		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx

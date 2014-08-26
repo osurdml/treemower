@@ -10,12 +10,12 @@
 #include <boost/bind.hpp>
 
 class StuntzHuntz : public DecisionTree {
-	long AddDecision(std::vector<state_t> *states, long x, long y, float score);
+	long AddDecision(std::vector<state_t> *states, long x, long y, float score, float budget);
 	long Explore(state_t *state, std::vector<state_t> *states);
 	vx_t FindBest(vx_t source_vx);
 
 public:
-	StuntzHuntz(const char *im_filename, long rows, long cols, int lookahead);
+	StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac);
 };
 
 #endif // STUNTZHUNTZ_HPP
