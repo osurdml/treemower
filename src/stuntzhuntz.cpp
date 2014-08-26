@@ -2,10 +2,9 @@
 
 #include <stdio.h>
 
-StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget) :
-	DecisionTree(im_filename, rows, cols, lookahead, budget)
+StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac) :
+	DecisionTree(im_filename, rows, cols, lookahead, budget, rand_frac)
 {
-	srand(0);
 }
 
 long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score, float budget)

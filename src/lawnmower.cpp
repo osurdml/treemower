@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-Lawnmower::Lawnmower(const char *im_filename, long rows, long cols, long lookahead, float budget) :
-	DecisionTree(im_filename, rows, cols, lookahead, budget)
+Lawnmower::Lawnmower(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac) :
+	DecisionTree(im_filename, rows, cols, lookahead, budget, rand_frac)
 {
 }
 

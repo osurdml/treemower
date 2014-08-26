@@ -39,6 +39,7 @@ typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 
 class DecisionTree {
 	long num_lookahead;
+	float random_choice_frac;   // Fraction of generated future states to actually follow through with during lookahead.
 	vx_t current_vx;   // Current vertex.
 
 	/**
@@ -127,8 +128,9 @@ public:
 	 * @param im_rows Number of columns to parse.
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
 	 * @param budget Transport budget.
+	 * @param rand_frac Fraction of generated future states to follow through with during lookahead.
 	 */
-	DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead, float budget);
+	DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead, float budget, float rand_frac);
 
 	/**
 	 * @brief Runs treemower.
