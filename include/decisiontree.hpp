@@ -40,6 +40,7 @@ typedef boost::graph_traits<Graph>::out_edge_iterator edge_iter;
 class DecisionTree {
 	long num_lookahead;
 	float random_choice_frac;   // Fraction of generated future states to actually follow through with during lookahead.
+	vx_t root_vx;   // Root vertex.
 	vx_t current_vx;   // Current vertex.
 
 	/**

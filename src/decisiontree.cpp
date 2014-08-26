@@ -13,13 +13,13 @@ DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, 
 	this->random_choice_frac = rand_frac;
 
 	// Add base vertex.
-	vx_t start_vx = boost::add_vertex(dTree);
-	dTree[start_vx].parent = 0;
-	dTree[start_vx].state.loc.x = 0;
-	dTree[start_vx].state.loc.y = 0;
-	dTree[start_vx].state.score = 0;
-	dTree[start_vx].state.budget = budget;
-	current_vx = start_vx;
+	root_vx = boost::add_vertex(dTree);
+	dTree[root_vx].parent = 0;
+	dTree[root_vx].state.loc.x = 0;
+	dTree[root_vx].state.loc.y = 0;
+	dTree[root_vx].state.score = 0;
+	dTree[root_vx].state.budget = budget;
+	current_vx = root_vx;
 	//frontier.push_back(current_vx);
 }
 
@@ -189,17 +189,19 @@ void DecisionTree::Export(const char *out_filename)
 		std::cerr << "Failed to open file " << out_filename << std::endl;
 	}
 
-	std::cout << "Graph contains " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
+	std::cout << "Exporting " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
 
 	// Write to file.
-	vx_t print_vx = current_vx;
-	location_t loc = dTree[current_vx].state.loc;
-	while (dTree[print_vx].parent != 0) {
-		ofs << loc.x << "," << loc.y << "\n";
-		print_vx = dTree[print_vx].parent;
+	vx_t print_vx = root_vx;
+	location_t loc = dTree[root_vx].state.loc;
+	ofs << loc.x << "," << loc.y << "\n";
+
+	while (boost::out_degree(print_vx, dTree) != 0) {
+		edge_t e = *boost::out_edges(print_vx, dTree).first;
+		print_vx = boost::target(e, dTree);
 		loc = dTree[print_vx].state.loc;
+		ofs << loc.x << "," << loc.y << "\n";
 	}
-	ofs << loc.x << "," << loc.y << "\n";   // TODO(yoos): Remove redundancy.
 
 	ofs.close();
 }
