@@ -99,14 +99,18 @@ void DecisionTree::PrintDebug(void)
 
 	// Print path
 	std::cout << "Path so far:\n";
-	vx_t print_vx = current_vx;
-	location_t loc = dTree[current_vx].state.loc;
-	while (dTree[print_vx].parent != 0) {
-		std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";
-		print_vx = dTree[print_vx].parent;
+
+	vx_t print_vx = root_vx;
+	location_t loc = dTree[root_vx].state.loc;
+	std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";
+
+	while (boost::out_degree(print_vx, dTree) != 0) {
+		edge_t e = *boost::out_edges(print_vx, dTree).first;
+		print_vx = boost::target(e, dTree);
 		loc = dTree[print_vx].state.loc;
+		std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";
 	}
-	std::cout << print_vx << " (" << loc.x << ", " << loc.y << ")\n";   // TODO(yoos): Remove redundancy.
+
 	std::cout << std::endl;
 }
 
