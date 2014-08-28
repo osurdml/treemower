@@ -19,20 +19,20 @@ rand_fracs = [1.0, 0.5, 0.2]
 
 # Open results file.
 res_f = open(RESULT_FN, 'wb')
-p_num = len(scoremaps) * len(algorithms) * len(lookaheads) * len(rand_fracs)
+p_num = len(scoremaps) * len(lookaheads) * len(rand_fracs)
 p_count = 1
 
 # Write header
-header = "Map,Lookahead,Budget,Random fraction"
+header = "Map, Lookahead, Budget, Random fraction"
 for alg in algorithms:
-    header += ','+alg
+    header += ', ' + alg
 print(header, file=res_f)
 
 # Run algorithms and record.
 for sm in scoremaps:
     for la in lookaheads:
         for f in rand_fracs:
-            res = sm + ',' + str(la) + ',' + str(BUDGET) + ',' + str(f)
+            res = sm + ', ' + str(la) + ', ' + str(BUDGET) + ', ' + str(f)
             for alg in algorithms:
                 # Record generated path to output dir.
                 rh_fn = OUTPUT_DIR + "/" + sm + "_" + alg + "_" + str(la) + "_" + str(BUDGET) + "_" + str(f) + ".txt";
@@ -40,12 +40,13 @@ for sm in scoremaps:
                 score = os.popen("./treemower " + rh_args).read()
 
                 # Add score to results line
-                res += ',' + score
+                res += ', ' + score
 
-                # Print progress
-                print(str(p_count)+'/'+str(p_num)+':', alg, "score:", score)
-                p_count += 1
+            # Print progress
+            print(str(p_count)+'/'+str(p_num)+':', res)
+            p_count += 1
 
+            # Write to file.
             print(res, file=res_f)
 
 # Close results file.
