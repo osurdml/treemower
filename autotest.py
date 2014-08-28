@@ -14,15 +14,21 @@ OUTPUT_DIR = 'output'
 # Stuff to permutate
 scoremaps = ['costmap', 'costmap2']
 algorithms = ['lm', 'rh']
-lookaheads = [2, 3, 4]
+lookaheads = [2, 3, 4, 7, 10]
 rand_fracs = [1.0, 0.5, 0.2]
 
-p_num = len(scoremaps) * len(algorithms) * len(lookaheads) * len(rand_fracs)
-
-
+# Open results file.
 res_f = open(RESULT_FN, 'wb')
-count = 1
+p_num = len(scoremaps) * len(algorithms) * len(lookaheads) * len(rand_fracs)
+p_count = 1
 
+# Write header
+header = "Map,Lookahead,Budget,Random fraction"
+for alg in algorithms:
+    header += ','+alg
+print(header, file=res_f)
+
+# Run algorithms and record.
 for sm in scoremaps:
     for la in lookaheads:
         for f in rand_fracs:
@@ -33,13 +39,16 @@ for sm in scoremaps:
                 rh_args = DATA_DIR + "/" + sm + ".txt " + alg + " " + str(la) + " " + str(BUDGET) + " " + str(f) + " " + rh_fn
                 score = os.popen("./treemower " + rh_args).read()
 
-                # Print progress
-                print(str(count)+'/'+str(p_num)+':', alg, "score:", score)
-                count += 1
+                # Add score to results line
                 res += ',' + score
+
+                # Print progress
+                print(str(p_count)+'/'+str(p_num)+':', alg, "score:", score)
+                p_count += 1
 
             print(res, file=res_f)
 
+# Close results file.
 res_f.close()
 
 
