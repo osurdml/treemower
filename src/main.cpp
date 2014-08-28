@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	std::cout << "Running Treemower." << std::endl;
+	//std::cout << "Running Treemower." << std::endl;
 
 	// Get costmap file.
 	long rows = 100;
@@ -35,8 +35,8 @@ int main(int argc, char **argv)
 		dt = new Lawnmower(cm_filename, rows, cols, lookahead, budget, rand_frac);
 	}
 
-	std::cout << alg << " score: " << dt->Mow() << "\n";
 	dt->Export(out_fn.c_str());
+	std::cout << dt->Mow();
 
 	return 0;
 }

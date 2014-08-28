@@ -175,10 +175,9 @@ float DecisionTree::Mow(void)
 		//im.PrintDebug();
 
 		//usleep(100000);
-		std::cout << ".";
+		//std::cout << ".";
 	}
 
-	std::cout << std::endl;
 	//PrintDebug();
 
 	return dTree[current_vx].state.score;
@@ -193,7 +192,7 @@ void DecisionTree::Export(const char *out_filename)
 		std::cerr << "Failed to open file " << out_filename << std::endl;
 	}
 
-	std::cout << "Exporting " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
+	//std::cout << "Exporting " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
 
 	// Write to file.
 	vx_t print_vx = root_vx;
