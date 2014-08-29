@@ -17,7 +17,7 @@ NUM_PROC = 10
 scoremaps = ['costmap', 'costmap2']
 algorithms = ['lm', 'rh']
 lookaheads = [2, 3, 4, 5]
-rand_fracs = [0.1, 0.2, 0.5, 1.0]
+rand_fracs = [0.25, 0.50, 0.75, 1.00]
 
 def args2fn(arglist):
     return OUTPUT_DIR + "/" + arglist['sm'] + "_" \
