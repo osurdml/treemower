@@ -14,8 +14,8 @@ OUTPUT_DIR = 'output'
 # Stuff to permutate
 scoremaps = ['costmap', 'costmap2']
 algorithms = ['lm', 'rh']
-lookaheads = [2, 3, 4, 7, 10]
-rand_fracs = [1.0, 0.5, 0.2]
+lookaheads = [2, 3, 4, 5]
+rand_fracs = [0.1, 0.2, 0.5, 1.0]
 
 # Open results file.
 res_f = open(RESULT_FN, 'wb')
