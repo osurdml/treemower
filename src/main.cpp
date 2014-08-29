@@ -35,8 +35,8 @@ int main(int argc, char **argv)
 		dt = new Lawnmower(cm_filename, rows, cols, lookahead, budget, rand_frac);
 	}
 
-	dt->Export(out_fn.c_str());
 	std::cout << dt->Mow();
+	dt->Export(out_fn.c_str());
 
 	return 0;
 }
