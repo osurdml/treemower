@@ -27,9 +27,11 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	long nc = 0;
 
 	// Examine surrounding eight cells for possible exploration.
-	for (int i=-1; i<2; i++) {
-		for (int j=-1; j<2; j++) {
-			if (im.depth(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
+	const int radius = 2;
+	const float dist = 2.0;
+	for (int i=-radius; i<=radius; i++) {
+		for (int j=-radius; j<=radius; j++) {
+			if (im.depth(x+i, y+j) >= 0 && (fabs(dist-sqrt(pow(i,2)+pow(j,2))) < 0.5)) {
 				//std::cout << x+i << ", " << y+j << "\n";
 				nc += AddDecision(states, x+i, y+j, CalcScore(state), state->budget-std::sqrt(std::pow(i,2)+std::pow(j,2)));
 			}
