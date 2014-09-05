@@ -139,18 +139,38 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	long y = state->loc.y;
 
 	// Reduce score of this cell and some surrounding cells.
-	im.set_score(x,y,   REDUCE_PER * im.score(x,y));
-	im.set_score(x,y+1, REDUCE_PER * im.score(x,y+1));
-	im.set_score(x,y-1, REDUCE_PER * im.score(x,y-1));
-	im.set_score(x+1,y, REDUCE_PER * im.score(x+1,y));
-	im.set_score(x-1,y, REDUCE_PER * im.score(x-1,y));
+	//im.set_score(x,y,   REDUCE_PER * im.score(x,y));
+	//im.set_score(x,y+1, REDUCE_PER * im.score(x,y+1));
+	//im.set_score(x,y-1, REDUCE_PER * im.score(x,y-1));
+	//im.set_score(x+1,y, REDUCE_PER * im.score(x+1,y));
+	//im.set_score(x-1,y, REDUCE_PER * im.score(x-1,y));
 
-	// Maybe depreciate more cells?
-	//for (int i=-1; i<2; i++) {
-	//	for (int j=-1; j<2; j++) {
-	//		im.set_score(x+i,y+j,   REDUCE_PER * im.score(x+i,y+j));
-	//	}
-	//}
+	// Depreciate score per distance from current location.
+	const int radius = 3;
+	const float MIN_SCORE = 0.0;
+	float reduce_per = 0.0;
+	for (int i=-radius; i<=radius; i++) {
+		for (int j=-radius; j<=radius; j++) {
+			int curDist = (0.5 + sqrt(pow(i,2)+pow(j,2)));
+			switch (curDist) {
+				case 0:
+					reduce_per = 0.5;
+					break;
+				case 1:
+					reduce_per = 0.2;
+					break;
+				case 2:
+					reduce_per = 0.1;
+					break;
+				case 3:
+					reduce_per = 0.05;
+					break;
+				default:
+					continue;
+			}
+			im.set_score(x+i,y+j, reduce_per * (im.score(x+i,y+j) - MIN_SCORE) + MIN_SCORE);
+		}
+	}
 }
 
 float DecisionTree::Mow(void)
