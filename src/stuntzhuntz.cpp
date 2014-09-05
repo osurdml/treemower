@@ -27,8 +27,8 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	long nc = 0;
 
 	// Examine surrounding eight cells for possible exploration.
-	const int radius = 2;
-	const float dist = 2.0;
+	const int radius = 5;
+	const float dist = 5.0;
 	for (int i=-radius; i<=radius; i++) {
 		for (int j=-radius; j<=radius; j++) {
 			if (im.depth(x+i, y+j) >= 0 && (fabs(dist-sqrt(pow(i,2)+pow(j,2))) < 0.5)) {
