@@ -26,17 +26,30 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	long y = state->loc.y;
 	long nc = 0;
 
-	// Examine surrounding eight cells for possible exploration.
-	const int radius = 5;
-	const float dist = 5.0;
-	for (int i=-radius; i<=radius; i++) {
-		for (int j=-radius; j<=radius; j++) {
-			if (im.depth(x+i, y+j) >= 0 && (fabs(dist-sqrt(pow(i,2)+pow(j,2))) < 0.5)) {
-				//std::cout << x+i << ", " << y+j << "\n";
-				nc += AddDecision(states, x+i, y+j, CalcScore(state), state->budget-std::sqrt(std::pow(i,2)+std::pow(j,2)));
-			}
+	// Generate future states by distance and angle.
+	const int radius = 10;
+	const int num = 12;
+	for (int i=0; i<num; i++) {
+		int dx = (radius * cos(2*M_PI/num*i));
+		int dy = (radius * sin(2*M_PI/num*i));
+		float dist = sqrt(pow(dx,2)+pow(dy,2));
+		if (im.depth(x+dx, y+dy) >= 0) {
+			nc += AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-dist);
 		}
 	}
+
+	// Generate future states by distance from current location.
+	//const int radius = 10;
+	//const float tgt_dist = 10.0;
+	//for (int i=-radius; i<=radius; i++) {
+	//	for (int j=-radius; j<=radius; j++) {
+	//		float dist = sqrt(pow(i,2)+pow(j,2));
+	//		if (im.depth(x+i, y+j) >= 0 && (fabs(tgt_dist-dist) < 0.5)) {
+	//			//std::cout << x+i << ", " << y+j << "\n";
+	//			nc += AddDecision(states, x+i, y+j, CalcScore(state), state->budget-dist);
+	//		}
+	//	}
+	//}
 
 	// Depreciate cost in and around visited location.
 	DepreciateScore(state);
