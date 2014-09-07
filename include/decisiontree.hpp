@@ -67,6 +67,8 @@ class DecisionTree {
 	void PrintDebug(void);
 
 protected:
+	float step_dist;
+	long branch_num;
 	InfoMap im;
 
 	/**

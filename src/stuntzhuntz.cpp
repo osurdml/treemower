@@ -27,11 +27,9 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	long nc = 0;
 
 	// Generate future states by distance and angle.
-	const int radius = 10;
-	const int num = 12;
-	for (int i=0; i<num; i++) {
-		int dx = (radius * cos(2*M_PI/num*i));
-		int dy = (radius * sin(2*M_PI/num*i));
+	for (int i=0; i<branch_num; i++) {
+		int dx = (step_dist * cos(2*M_PI/branch_num*i));
+		int dy = (step_dist * sin(2*M_PI/branch_num*i));
 		float dist = sqrt(pow(dx,2)+pow(dy,2));
 		if (im.depth(x+dx, y+dy) >= 0) {
 			nc += AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-dist);
