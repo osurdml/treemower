@@ -24,6 +24,7 @@ public:
 
 	// Info getters
 	float score(long x, long y) const;
+	float score(long x, long y, float radius) const;
 	float depth(long x, long y) const;
 	float temperature(long x, long y) const;
 	float oxygen(long x, long y) const;
