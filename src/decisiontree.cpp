@@ -10,8 +10,6 @@ DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, 
 	srand(3);
 
 	this->num_lookahead = num_lookahead;
-	this->step_dist = 5.0;
-	this->branch_num = 12;
 	this->random_choice_frac = rand_frac;
 
 	// Add base vertex.
@@ -178,13 +176,9 @@ void DecisionTree::DepreciateScore(const state_t *state)
 float DecisionTree::Mow(void)
 {
 	while (dTree[current_vx].state.budget > 0) {
-		std::cout << dTree[current_vx].state.budget << "\n";
-
-		// Reevaluate step distance based on nearby scores
-		long x = dTree[current_vx].state.loc.x;
-		long y = dTree[current_vx].state.loc.y;
-		step_dist = fmax(fmin(12/im.score(x,y), 200), 5);
-		branch_num = 5*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+		// DEBUG
+		std::cout << std::setw(8) << dTree[current_vx].state.budget;
+		std::cout << "\n";
 
 		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);
