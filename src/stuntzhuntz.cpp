@@ -26,13 +26,16 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	long y = state->loc.y;
 	long nc = 0;
 
+	// Calculate step distance based on nearby scores.
+	float step_dist = fmax(fmin(12/im.score(x,y,4), 400), 5);
+	float branch_num = 5*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+
 	// Generate future states by distance and angle.
 	for (int i=0; i<branch_num; i++) {
 		int dx = (step_dist * cos(2*M_PI/branch_num*i));
 		int dy = (step_dist * sin(2*M_PI/branch_num*i));
-		float dist = sqrt(pow(dx,2)+pow(dy,2));
 		if (im.depth(x+dx, y+dy) >= 0) {
-			nc += AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-dist);
+			nc += AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-step_dist);
 		}
 	}
 
