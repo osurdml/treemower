@@ -1,6 +1,8 @@
 #include <decisiontree.hpp>
 
 #include <fstream>
+#include <iostream>
+#include <iomanip>
 
 #include <boost/bind.hpp>
 
@@ -152,18 +154,28 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	for (int i=-radius; i<=radius; i++) {
 		for (int j=-radius; j<=radius; j++) {
 			int curDist = (0.5 + sqrt(pow(i,2)+pow(j,2)));
+			//if (curDist <= 5) {
+			//	reduce_per = 0.5;
+			//}
+			reduce_per = 1.0;
 			switch (curDist) {
 				case 0:
 					reduce_per = 0.5;
 					break;
 				case 1:
-					reduce_per = 0.2;
+					reduce_per = 0.62;
 					break;
 				case 2:
-					reduce_per = 0.1;
+					reduce_per = 0.72;
 					break;
 				case 3:
-					reduce_per = 0.05;
+					reduce_per = 0.8;
+					break;
+				case 4:
+					reduce_per = 0.86;
+					break;
+				case 5:
+					reduce_per = 0.90;
 					break;
 				default:
 					continue;
@@ -177,8 +189,8 @@ float DecisionTree::Mow(void)
 {
 	while (dTree[current_vx].state.budget > 0) {
 		// DEBUG
-		std::cout << std::setw(8) << dTree[current_vx].state.budget;
-		std::cout << "\n";
+		//std::cout << std::setw(8) << dTree[current_vx].state.budget;
+		//std::cout << "\n";
 
 		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);

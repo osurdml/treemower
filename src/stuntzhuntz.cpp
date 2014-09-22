@@ -1,6 +1,6 @@
 #include <stuntzhuntz.hpp>
 
-#include <stdio.h>
+#include <iostream>
 
 StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac) :
 	DecisionTree(im_filename, rows, cols, lookahead, budget, rand_frac)
@@ -30,12 +30,44 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	float step_dist = fmax(fmin(12/im.score(x,y,4), 400), 5);
 	float branch_num = 5*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
 
-	// Generate future states by distance and angle.
-	for (int i=0; i<branch_num; i++) {
-		int dx = (step_dist * cos(2*M_PI/branch_num*i));
-		int dy = (step_dist * sin(2*M_PI/branch_num*i));
-		if (im.depth(x+dx, y+dy) >= 0) {
-			nc += AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-step_dist);
+	// TODO(yoos): Okay, might want to move step_dist back to decisiontree if this works.
+	while (states->size() == 0) {
+		nc = 0;
+		// Generate future states by distance and angle.
+		std::vector<state_t> probe_states;
+		for (int i=0; i<branch_num; i++) {
+			int dx = (step_dist * cos(2*M_PI/branch_num*i));
+			int dy = (step_dist * sin(2*M_PI/branch_num*i));
+			if (im.depth(x+dx, y+dy) >= 0) {
+				nc += AddDecision(&probe_states, x+dx, y+dy, CalcScore(state), state->budget-step_dist);
+			}
+		}
+
+		// Check if probed state satisfies criteria (TODO: what?)
+		for (std::vector<state_t>::iterator it=probe_states.begin(); it!=probe_states.end(); it++) {
+			if (im.score(it->loc.x, it->loc.y, 2) > 2.0) {
+				states->push_back(*it);
+			}
+		}
+
+		// Increase step_dist to try and find better pasture.
+		// TODO(yoos): What if we never do?
+		step_dist += 5;
+		branch_num = 5*sqrt(step_dist);
+		if (step_dist > 500) {
+			// Can't find good values, so just go somewhere.
+			step_dist = 20;   // ARBITRARY?
+			branch_num = 5*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+
+			// Generate future states by distance and angle.
+			for (int i=0; i<branch_num; i++) {
+				int dx = (step_dist * cos(2*M_PI/branch_num*i));
+				int dy = (step_dist * sin(2*M_PI/branch_num*i));
+				if (im.depth(x+dx, y+dy) >= 0) {
+					nc += AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-step_dist);
+				}
+			}
+			break;
 		}
 	}
 
