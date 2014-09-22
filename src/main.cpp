@@ -17,8 +17,8 @@ int main(int argc, char **argv)
 	//std::cout << "Running Treemower." << std::endl;
 
 	// Get costmap file.
-	long rows = 100;
-	long cols = 100;
+	long rows = 500;
+	long cols = 500;
 	const char *cm_filename = argv[1];
 
 	std::string alg = argv[2];
