@@ -24,7 +24,7 @@ def args2fn(arglist):
             + arglist['alg'] + "_" \
             + str(arglist['la']) + "_" \
             + str(arglist['budget']) + "_" \
-            + str(arglist['frac']) + ".txt"
+            + str(arglist['frac']) + ".path"
 
 def args2cmd(arglist):
     return './treemower ' \
