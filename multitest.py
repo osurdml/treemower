@@ -8,16 +8,16 @@ import multiprocessing
 RESULT_FN = sys.argv[1]
 
 # Setup
-BUDGET = 4000
 DATA_DIR = 'data'
 OUTPUT_DIR = 'output'
 NUM_PROC = 10
 
 # Stuff to permutate
-scoremaps = ['costmap', 'costmap2']
+budgets    = [1000, 2000, 3000, 4000, 5000]
+scoremaps  = ['500x500_test'] #'costmap2']
 algorithms = ['lm', 'rh']
 lookaheads = [2, 3, 4, 5]
-rand_fracs = [0.25, 0.50, 0.75, 1.00]
+rand_fracs = [1.00]#[0.25, 0.50, 0.75, 1.00]
 
 def args2fn(arglist):
     return OUTPUT_DIR + "/" + arglist['sm'] + "_" \
@@ -57,11 +57,12 @@ def run(mp_args):
 p_list = []
 for sm in scoremaps:
     for la in lookaheads:
-        for f in rand_fracs:
-            arglist = {'sm': sm, 'la': la, 'budget': BUDGET, 'frac': f}
-            for alg in algorithms:
-                arglist['alg'] = alg
-                p_list.append(arglist.copy())
+	for bu in budgets:
+            for f in rand_fracs:
+                arglist = {'sm': sm, 'la': la, 'budget': bu, 'frac': 1.00}
+                for alg in algorithms:
+                    arglist['alg'] = alg
+                    p_list.append(arglist.copy())
 
 # Open results file.
 res_f = open(RESULT_FN, 'wb')
@@ -84,13 +85,14 @@ mp.join()
 res_idx = 0
 for sm in scoremaps:
     for la in lookaheads:
-        for f in rand_fracs:
-            arglist = {'sm': sm, 'la': la, 'budget': BUDGET, 'frac': f}
-            res_f.write(args2csv(arglist))
-            for alg in algorithms:
-                res_f.write(', '+mp_results[res_idx])
-                res_idx += 1
-            res_f.write('\n')
+	for bu in budgets:
+            for f in rand_fracs:
+                arglist = {'sm': sm, 'la': la, 'budget': bu, 'frac': 1.00}
+                res_f.write(args2csv(arglist))
+                for alg in algorithms:
+                    res_f.write(', '+mp_results[res_idx])
+                    res_idx += 1
+                res_f.write('\n')
 
 # Close results file.
 res_f.close()
