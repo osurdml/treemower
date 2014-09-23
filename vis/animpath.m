@@ -1,4 +1,4 @@
-function exitcode = animplot(scoremap_fn, path_fn)
+function exitcode = animpath(scoremap_fn, path_fn)
 	scoremap = csvread(scoremap_fn);
 	M = csvread(path_fn);
 	x = M(:,2);
