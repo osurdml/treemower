@@ -49,9 +49,9 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	step_dist = 5;
 	branch_num = 5*sqrt(step_dist);
 
-	if (false) {
+	if (true) {
 		// Calculate step distance based on nearby scores.
-		step_dist = fmax(fmin(5/im.score(x,y,4), 400), 5);
+		step_dist = fmax(fmin(1/im.score(x,y,4), 80), 1) * 5;   // TODO(yoos): The 5 here is the sampling interval. Should make it a constant definition.
 		branch_num = 5*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
 
 		// TODO(yoos): Okay, might want to move step_dist back to decisiontree if this works.
@@ -81,7 +81,6 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 				nc += AddDecisions(state, step_dist, branch_num, states);
 				break;
 			}
-			break;
 		}
 	}
 	else {
