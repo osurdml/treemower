@@ -135,8 +135,6 @@ float DecisionTree::CalcScore(const state_t *state)
 
 void DecisionTree::DepreciateScore(const state_t *state)
 {
-	const float REDUCE_PER = 0.5;
-
 	long x = state->loc.x;
 	long y = state->loc.y;
 
@@ -148,14 +146,12 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	//im.set_score(x-1,y, REDUCE_PER * im.score(x-1,y));
 
 	// Depreciate score per distance from current location.
-	const int radius = 3;
-	const float MIN_SCORE = 0.0;
-	float reduce_per = 0.0;
-	for (int i=-radius; i<=radius; i++) {
-		for (int j=-radius; j<=radius; j++) {
+	float reduce_factor = 0.0;
+	for (int i=-SAMPLE_RADIUS; i<=SAMPLE_RADIUS; i++) {
+		for (int j=-SAMPLE_RADIUS; j<=SAMPLE_RADIUS; j++) {
 			int curDist = (0.5 + sqrt(pow(i,2)+pow(j,2)));
-			if (curDist <= 5) {
-				reduce_per = 0.5;
+			if (curDist <= SAMPLE_RADIUS) {
+				reduce_factor = UNCERTAINTY_REDUCE_FACTOR;
 			}
 			//reduce_per = 1.0;
 			//switch (curDist) {
@@ -180,7 +176,7 @@ void DecisionTree::DepreciateScore(const state_t *state)
 			//	default:
 			//		continue;
 			//}
-			im.set_score(x+i,y+j, reduce_per * (im.score(x+i,y+j) - MIN_SCORE) + MIN_SCORE);
+			im.set_score(x+i,y+j, reduce_factor * im.score(x+i,y+j));
 			//if (im.score(x+i, y+j) <= 2.0) {
 			//	im.set_score(x+i, y+j, 0);
 			//}

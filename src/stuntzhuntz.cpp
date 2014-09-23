@@ -46,13 +46,13 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	x = state->loc.x;
 	y = state->loc.y;
 	nc = 0;
-	step_dist = 5;
-	branch_num = 5*sqrt(step_dist);
+	step_dist = SAMPLE_INTERVAL;
+	branch_num = BRANCH_FACTOR*sqrt(step_dist);
 
-	if (true) {
+	if (false) {
 		// Calculate step distance based on nearby scores.
-		step_dist = fmax(fmin(1/im.score(x,y,4), 80), 1) * 5;   // TODO(yoos): The 5 here is the sampling interval. Should make it a constant definition.
-		branch_num = 5*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+		step_dist = fmax(fmin(5/im.score(x,y,SAMPLE_RADIUS), 400), SAMPLE_INTERVAL);
+		branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
 
 		// TODO(yoos): Okay, might want to move step_dist back to decisiontree if this works.
 		while (states->size() == 0) {
@@ -63,19 +63,19 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 
 			// Check if probed state satisfies criteria (TODO: what?)
 			for (std::vector<state_t>::iterator it=probe_states.begin(); it!=probe_states.end(); it++) {
-				if (im.score(it->loc.x, it->loc.y, 2) > 2.0) {
+				if (im.score(it->loc.x, it->loc.y, SAMPLE_RADIUS) > UNCERTAINTY_THRESHOLD) {
 					states->push_back(*it);
 				}
 			}
 
 			// Increase step_dist to try and find better pasture.
-			// TODO(yoos): What if we never do?
-			step_dist += 5;
-			branch_num = 5*sqrt(step_dist);
+			step_dist += SAMPLE_INTERVAL;
+			branch_num = BRANCH_FACTOR*sqrt(step_dist);
+
+			// If we can't find anything, just go somewhere.
 			if (step_dist > 500) {
-				// Can't find good values, so just go somewhere.
-				step_dist = 20;   // ARBITRARY?
-				branch_num = 5*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+				step_dist = 20;   // Arbitrary. I'm really hoping this never happens.
+				branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
 
 				// Generate future states by distance and angle.
 				nc += AddDecisions(state, step_dist, branch_num, states);

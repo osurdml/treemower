@@ -2,6 +2,7 @@
 #define DECISIONTREE_HPP
 
 #include <infomap.hpp>
+#include <config.hpp>
 
 #include <stdio.h>
 #include <vector>
