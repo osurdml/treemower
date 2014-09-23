@@ -144,6 +144,51 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	}
 }
 
+vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
+{
+	static long x, y, target_x, target_y;
+	static float t, dx, dy;
+	x = dTree[source_vx].state.loc.x;
+	y = dTree[source_vx].state.loc.y;
+	target_x = target_state.loc.x;
+	target_y = target_state.loc.y;
+	t = atan2(target_y-y, target_x-x);
+	dx = SAMPLE_INTERVAL * cos(t);
+	dy = SAMPLE_INTERVAL * sin(t);
+
+	vx_t parent_vx = dTree[source_vx].parent;
+	vx_t new_vx = source_vx;
+	std::cout << "Current: " << x << ", " << y << "\n";
+	std::cout << "Target: " << target_x << ", " << target_y << "\n";
+	float dist_mult = sqrt(pow(x-target_x,2)+pow(y-target_y,2))/SAMPLE_INTERVAL;
+	std::cout << "Distance mult.: " << dist_mult << "\n";
+	std::cout << dx << "  " << dy << "\n";
+	for (long i=0; i<dist_mult; i++) {
+		// Step forward.
+		x = dTree[source_vx].state.loc.x + dx*(i+1);
+		y = dTree[source_vx].state.loc.y + dy*(i+1);
+		std::cout << "Current: " << i << ": " << x << ", " << y << "\n";
+		parent_vx = new_vx;
+		new_vx = boost::add_vertex(dTree);
+
+		// Add new stuff to graph.
+		boost::add_edge(parent_vx, new_vx, dTree);
+		dTree[new_vx].parent = parent_vx;
+		dTree[new_vx].state = (state_t) {{x,y}, CalcScore(&dTree[parent_vx].state), dTree[parent_vx].state.budget-SAMPLE_INTERVAL};
+		DepreciateScore(&dTree[new_vx].state);
+	}
+
+	// DEBUG
+	//parent_vx = source_vx;
+	//new_vx = boost::add_vertex(dTree);
+	//boost::add_edge(source_vx, new_vx, dTree);
+	//dTree[new_vx].parent = source_vx;
+	//dTree[new_vx].state = target_state;
+	//DepreciateScore(&dTree[new_vx].state);
+
+	return new_vx;
+}
+
 float DecisionTree::Mow(void)
 {
 	while (dTree[current_vx].state.budget > 0) {
@@ -152,17 +197,20 @@ float DecisionTree::Mow(void)
 		std::cout << "\n";
 
 		LookAhead(current_vx, num_lookahead);
-		vx_t best_vx = FindBest(current_vx);
-		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
-		current_vx = best_vx;
+		state_t target_state = dTree[FindBest(current_vx)].state;   // Some location way out there.
+		Prune(current_vx, 0);   // Prune all branches
 
 		// Step costmap forward.
 		im.Step(1);
+
+		// Sample along path to target.
+		current_vx = SampleToTarget(current_vx, target_state);
+
 		// TODO(yoos): Clean this up. This runs whatever the user wants to
 		// change about our current state and obviously disregards the
 		// generated future states.
-		std::vector<state_t> future_states;
-		Explore(&dTree[current_vx].state, &future_states);
+		//std::vector<state_t> future_states;
+		//Explore(&dTree[current_vx].state, &future_states);
 
 		// DEBUG
 		//state_t *s = &dTree[current_vx].state;

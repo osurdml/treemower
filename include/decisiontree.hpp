@@ -62,6 +62,8 @@ class DecisionTree {
 	 */
 	void Prune(vx_t source_vx, vx_t exclude_vx);
 
+	vx_t SampleToTarget(vx_t source_vx, state_t target_state);
+
 	/**
 	 * @brief Debug
 	 */
