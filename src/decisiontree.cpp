@@ -132,14 +132,14 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	// Depreciate score per distance from current location.
 	float reduce_factor = 0.0;
 	float dist;
-	for (int i=-SAMPLE_RADIUS; i<=SAMPLE_RADIUS; i++) {
-		for (int j=-SAMPLE_RADIUS; j<=SAMPLE_RADIUS; j++) {
-			dist = sqrt(pow(i,2)+pow(j,2));
+	for (int dx=-SAMPLE_RADIUS; dx<=SAMPLE_RADIUS; dx++) {
+		for (int dy=-SAMPLE_RADIUS; dy<=SAMPLE_RADIUS; dy++) {
+			dist = sqrt(pow(dx,2)+pow(dy,2));
 			if (dist <= SAMPLE_RADIUS) {
 				reduce_factor = UNCERTAINTY_REDUCE_FACTOR;
 			}
 			reduce_factor *= pow(UNCERTAINTY_REDUCE_EXP,(int)dist);
-			im.set_score(x+i,y+j, reduce_factor * im.score(x+i,y+j));
+			im.set_score(x+dx,y+dy, reduce_factor * im.score(x+dx,y+dy));
 		}
 	}
 }
