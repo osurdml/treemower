@@ -17,8 +17,8 @@ DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, 
 	// Add base vertex.
 	root_vx = boost::add_vertex(dTree);
 	dTree[root_vx].parent = 0;
-	dTree[root_vx].state.loc.x = 250;
-	dTree[root_vx].state.loc.y = 400;
+	dTree[root_vx].state.loc.x = START_X;
+	dTree[root_vx].state.loc.y = START_Y;
 	dTree[root_vx].state.score = 0;
 	dTree[root_vx].state.budget = budget;
 	current_vx = root_vx;
@@ -121,16 +121,7 @@ float DecisionTree::CalcScore(const state_t *state)
 	long x = state->loc.x;
 	long y = state->loc.y;
 
-	// This assumes BaseMap::score() returns -1 if coordinates are invalid, in
-	// which case we ignore the score.
-	float s = state->score +
-		std::max(0.0f, im.score(x, y)) +
-		std::max(0.0f, im.score(x, y+1)) +
-		std::max(0.0f, im.score(x, y-1)) +
-		std::max(0.0f, im.score(x+1, y)) +
-		std::max(0.0f, im.score(x-1, y));
-
-	return s;
+	return state->score + im.score(x, y, SAMPLE_RADIUS);
 }
 
 void DecisionTree::DepreciateScore(const state_t *state)
@@ -138,48 +129,17 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	long x = state->loc.x;
 	long y = state->loc.y;
 
-	// Reduce score of this cell and some surrounding cells.
-	//im.set_score(x,y,   REDUCE_PER * im.score(x,y));
-	//im.set_score(x,y+1, REDUCE_PER * im.score(x,y+1));
-	//im.set_score(x,y-1, REDUCE_PER * im.score(x,y-1));
-	//im.set_score(x+1,y, REDUCE_PER * im.score(x+1,y));
-	//im.set_score(x-1,y, REDUCE_PER * im.score(x-1,y));
-
 	// Depreciate score per distance from current location.
 	float reduce_factor = 0.0;
+	float dist;
 	for (int i=-SAMPLE_RADIUS; i<=SAMPLE_RADIUS; i++) {
 		for (int j=-SAMPLE_RADIUS; j<=SAMPLE_RADIUS; j++) {
-			int curDist = (0.5 + sqrt(pow(i,2)+pow(j,2)));
-			if (curDist <= SAMPLE_RADIUS) {
+			dist = sqrt(pow(i,2)+pow(j,2));
+			if (dist <= SAMPLE_RADIUS) {
 				reduce_factor = UNCERTAINTY_REDUCE_FACTOR;
 			}
-			//reduce_per = 1.0;
-			//switch (curDist) {
-			//	case 0:
-			//		reduce_per = 0.5;
-			//		break;
-			//	case 1:
-			//		reduce_per = 0.62;
-			//		break;
-			//	case 2:
-			//		reduce_per = 0.72;
-			//		break;
-			//	case 3:
-			//		reduce_per = 0.8;
-			//		break;
-			//	case 4:
-			//		reduce_per = 0.86;
-			//		break;
-			//	case 5:
-			//		reduce_per = 0.90;
-			//		break;
-			//	default:
-			//		continue;
-			//}
+			reduce_factor *= pow(UNCERTAINTY_REDUCE_EXP,(int)dist);
 			im.set_score(x+i,y+j, reduce_factor * im.score(x+i,y+j));
-			//if (im.score(x+i, y+j) <= 2.0) {
-			//	im.set_score(x+i, y+j, 0);
-			//}
 		}
 	}
 }

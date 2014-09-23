@@ -98,20 +98,12 @@ vx_t StuntzHuntz::FindBest(vx_t source_vx)
 {
 	vx_t best_vx = source_vx;
 	float best_score = dTree[source_vx].state.score;
-	//float x = dTree[source_vx].state.loc.x;
-	//float y = dTree[source_vx].state.loc.y;
 
 	if (boost::out_degree(source_vx, dTree) > 0) {
 		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, dTree);
 		for(; edges.first != edges.second; edges.first++) {
 			vx_t child_vx = boost::target(*edges.first, dTree);
 			float child_score = dTree[FindBest(child_vx)].state.score;
-
-			// TODO(yoos): distance weight
-			//float child_x = dTree[child_vx].state.loc.x;
-			//float child_y = dTree[child_vx].state.loc.y;
-			//float child_dist = sqrt(pow(x-child_x, 2) + pow(y-child_y, 2));
-			//child_score /= sqrt(child_dist);
 
 			if (child_score >= best_score) {
 				best_vx = child_vx;
