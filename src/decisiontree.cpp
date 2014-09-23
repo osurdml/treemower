@@ -17,8 +17,8 @@ DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, 
 	// Add base vertex.
 	root_vx = boost::add_vertex(dTree);
 	dTree[root_vx].parent = 0;
-	dTree[root_vx].state.loc.x = 0;
-	dTree[root_vx].state.loc.y = 0;
+	dTree[root_vx].state.loc.x = 250;
+	dTree[root_vx].state.loc.y = 400;
 	dTree[root_vx].state.score = 0;
 	dTree[root_vx].state.budget = budget;
 	current_vx = root_vx;
@@ -154,33 +154,36 @@ void DecisionTree::DepreciateScore(const state_t *state)
 	for (int i=-radius; i<=radius; i++) {
 		for (int j=-radius; j<=radius; j++) {
 			int curDist = (0.5 + sqrt(pow(i,2)+pow(j,2)));
-			//if (curDist <= 5) {
-			//	reduce_per = 0.5;
-			//}
-			reduce_per = 1.0;
-			switch (curDist) {
-				case 0:
-					reduce_per = 0.5;
-					break;
-				case 1:
-					reduce_per = 0.62;
-					break;
-				case 2:
-					reduce_per = 0.72;
-					break;
-				case 3:
-					reduce_per = 0.8;
-					break;
-				case 4:
-					reduce_per = 0.86;
-					break;
-				case 5:
-					reduce_per = 0.90;
-					break;
-				default:
-					continue;
+			if (curDist <= 5) {
+				reduce_per = 0.5;
 			}
+			//reduce_per = 1.0;
+			//switch (curDist) {
+			//	case 0:
+			//		reduce_per = 0.5;
+			//		break;
+			//	case 1:
+			//		reduce_per = 0.62;
+			//		break;
+			//	case 2:
+			//		reduce_per = 0.72;
+			//		break;
+			//	case 3:
+			//		reduce_per = 0.8;
+			//		break;
+			//	case 4:
+			//		reduce_per = 0.86;
+			//		break;
+			//	case 5:
+			//		reduce_per = 0.90;
+			//		break;
+			//	default:
+			//		continue;
+			//}
 			im.set_score(x+i,y+j, reduce_per * (im.score(x+i,y+j) - MIN_SCORE) + MIN_SCORE);
+			//if (im.score(x+i, y+j) <= 2.0) {
+			//	im.set_score(x+i, y+j, 0);
+			//}
 		}
 	}
 }
@@ -189,8 +192,8 @@ float DecisionTree::Mow(void)
 {
 	while (dTree[current_vx].state.budget > 0) {
 		// DEBUG
-		//std::cout << std::setw(8) << dTree[current_vx].state.budget;
-		//std::cout << "\n";
+		std::cout << std::setw(8) << dTree[current_vx].state.budget;
+		std::cout << "\n";
 
 		LookAhead(current_vx, num_lookahead);
 		vx_t best_vx = FindBest(current_vx);
