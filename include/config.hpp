@@ -1,11 +1,11 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#define UNCERTAINTY_REDUCE_FACTOR 0.5
-#define SAMPLE_RADIUS 5
-#define SAMPLE_INTERVAL 5
-#define BRANCH_FACTOR 5
-#define UNCERTAINTY_THRESHOLD 2.0
+const float UNCERTAINTY_REDUCE_FACTOR = 0.5;
+const long SAMPLE_RADIUS = 3;
+const long SAMPLE_INTERVAL = 5;
+const long BRANCH_FACTOR = 5;
+const float UNCERTAINTY_THRESHOLD = 2.0;
 
 #endif // CONFIG_HPP
 
