@@ -36,14 +36,19 @@ float InfoMap::score(long x, long y) const
 float InfoMap::score(long x, long y, float radius) const
 {
 	float sum = 0.0;
+	long count = 0;
 
-	// TODO(yoos): This averages over a square, not a circle, though I'm not sure it matters much.
-	for (int dx=-radius; dx<=radius; dx++) {
-		for (int dy=-radius; dy<=radius; dy++) {
-			sum += MatrixGet(&_score, x+dx, y+dy);
+	float dist;
+	for (long dx=-radius; dx<=radius; dx++) {
+		for (long dy=-radius; dy<=radius; dy++) {
+			dist = sqrt(pow(dx,2)+pow(dy,2));
+			if (dist <= radius) {
+				count++;
+				sum += std::max(0.0f, MatrixGet(&_score, x+dx, y+dy));
+			}
 		}
 	}
-	sum /= (2*radius+1) * (2*radius+1);
+	sum /= count;
 
 	return sum;
 }
