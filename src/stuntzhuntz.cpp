@@ -89,19 +89,6 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 		nc += AddDecisions(state, step_dist, branch_num, states);
 	}
 
-	// Generate future states by distance from current location.
-	//const int radius = 10;
-	//const float tgt_dist = 10.0;
-	//for (int i=-radius; i<=radius; i++) {
-	//	for (int j=-radius; j<=radius; j++) {
-	//		float dist = sqrt(pow(i,2)+pow(j,2));
-	//		if (im.depth(x+i, y+j) >= 0 && (fabs(tgt_dist-dist) < 0.5)) {
-	//			//std::cout << x+i << ", " << y+j << "\n";
-	//			nc += AddDecision(states, x+i, y+j, CalcScore(state), state->budget-dist);
-	//		}
-	//	}
-	//}
-
 	// Depreciate cost in and around visited location.
 	DepreciateScore(state);
 
