@@ -49,7 +49,7 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	step_dist = SAMPLE_INTERVAL;
 	branch_num = BRANCH_FACTOR*sqrt(step_dist);
 
-	if (true) {
+	if (false) {
 		// Calculate step distance based on nearby scores.
 		step_dist = fmax(fmin(5/im.score(x,y,SAMPLE_RADIUS), 400), SAMPLE_INTERVAL);
 		branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.

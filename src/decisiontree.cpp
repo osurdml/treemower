@@ -146,37 +146,37 @@ void DecisionTree::DepreciateScore(const state_t *state)
 
 vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 {
-	static long x, y, target_x, target_y;
-	static float t, dx, dy;
-	x = dTree[source_vx].state.loc.x;
-	y = dTree[source_vx].state.loc.y;
-	target_x = target_state.loc.x;
-	target_y = target_state.loc.y;
-	t = atan2(target_y-y, target_x-x);
-	dx = SAMPLE_INTERVAL * cos(t);
-	dy = SAMPLE_INTERVAL * sin(t);
+	static long src_x, src_y, tgt_x, tgt_y, num_steps;
+	static float dx, dy, dist;
+	src_x = dTree[source_vx].state.loc.x;
+	src_y = dTree[source_vx].state.loc.y;
+	tgt_x = target_state.loc.x;
+	tgt_y = target_state.loc.y;
+	dx = tgt_x - src_x;
+	dy = tgt_y - src_y;
+	dist = sqrt(pow(dx,2)+pow(dy,2));
+	num_steps = fmax(1, (dist+0.5)/SAMPLE_INTERVAL);
 
-	vx_t parent_vx = dTree[source_vx].parent;
+	vx_t parent_vx;
 	vx_t new_vx = source_vx;
-	std::cout << "Current: " << x << ", " << y << "\n";
-	std::cout << "Target: " << target_x << ", " << target_y << "\n";
-	float dist_mult = sqrt(pow(x-target_x,2)+pow(y-target_y,2))/SAMPLE_INTERVAL;
-	std::cout << "Distance mult.: " << dist_mult << "\n";
-	std::cout << dx << "  " << dy << "\n";
-	for (long i=0; i<dist_mult; i++) {
+
+	for (long i=0; i<num_steps; i++) {
 		// Step forward.
-		x = dTree[source_vx].state.loc.x + dx*(i+1);
-		y = dTree[source_vx].state.loc.y + dy*(i+1);
-		std::cout << "Current: " << i << ": " << x << ", " << y << "\n";
+		src_x = dTree[source_vx].state.loc.x + dx*(i+1)/num_steps;
+		src_y = dTree[source_vx].state.loc.y + dy*(i+1)/num_steps;
 		parent_vx = new_vx;
 		new_vx = boost::add_vertex(dTree);
 
 		// Add new stuff to graph.
 		boost::add_edge(parent_vx, new_vx, dTree);
 		dTree[new_vx].parent = parent_vx;
-		dTree[new_vx].state = (state_t) {{x,y}, CalcScore(&dTree[parent_vx].state), dTree[parent_vx].state.budget-SAMPLE_INTERVAL};
-		DepreciateScore(&dTree[new_vx].state);
+		dTree[new_vx].state = (state_t) {{src_x,src_y}, CalcScore(&dTree[parent_vx].state), dTree[parent_vx].state.budget-dist/num_steps};
+		DepreciateScore(&dTree[parent_vx].state);
 	}
+
+	// We shouldn't have floating point errors.
+	assert(dTree[new_vx].state.loc.x == target_state.loc.x);
+	assert(dTree[new_vx].state.loc.y == target_state.loc.y);
 
 	// DEBUG
 	//parent_vx = source_vx;
