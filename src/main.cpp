@@ -17,22 +17,23 @@ int main(int argc, char **argv)
 	//std::cout << "Running Treemower." << std::endl;
 
 	// Get costmap file.
-	long rows = 500;
-	long cols = 500;
+	MAP_X = 500;
+	MAP_Y = 500;
 	const char *cm_filename = argv[1];
 
+	LOOKAHEAD = atol(argv[3]);
+	BUDGET = atol(argv[4]);
+	RAND_FRAC = atof(argv[5]);
+
 	std::string alg = argv[2];
-	long lookahead = atol(argv[3]);
-	long budget = atol(argv[4]);
-	float rand_frac = atof(argv[5]);
 	std::string out_fn = argv[6];
 
 	DecisionTree *dt;
 	if (alg == "rh") {
-		dt = new StuntzHuntz(cm_filename, rows, cols, lookahead, budget, rand_frac);
+		dt = new StuntzHuntz(cm_filename, MAP_X, MAP_Y, LOOKAHEAD, BUDGET, RAND_FRAC);
 	}
 	else {
-		dt = new Lawnmower(cm_filename, rows, cols, lookahead, budget, rand_frac);
+		dt = new Lawnmower(cm_filename, MAP_X, MAP_Y, LOOKAHEAD, BUDGET, RAND_FRAC);
 	}
 
 	std::cout << dt->Mow();

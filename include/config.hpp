@@ -3,9 +3,18 @@
 
 const bool PRINT_DEBUG = true;
 
+// Map size
+extern long MAP_X;
+extern long MAP_Y;
+
 // Start location
-const long START_X = 400;
-const long START_Y = 20;
+extern long START_X;
+extern long START_Y;
+
+// Algorithm parameters (these will probably be permutated a lot via an external script
+extern long LOOKAHEAD;
+extern long BUDGET;
+extern float RAND_FRAC;
 
 // THE FOLLOWING SHOULD PROBABLY STAY CONSTANT, AS THEY DEPEND ON BOAT CONFIG
 
