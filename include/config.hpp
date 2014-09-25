@@ -1,5 +1,5 @@
-#ifndef DEFAULTS_HPP
-#define DEFAULTS_HPP
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
 const bool PRINT_DEBUG = true;
 
@@ -30,5 +30,5 @@ const float UNCERTAINTY_REDUCE_EXP = 1.0;
 // Uncertainty below this is "good enough."
 const float UNCERTAINTY_THRESHOLD = 2.0;
 
-#endif // DEFAULTS_HPP
+#endif // CONFIG_HPP
 
