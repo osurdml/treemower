@@ -1,6 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+const bool PRINT_DEBUG = true;
+
 // Start location
 const long START_X = 250;
 const long START_Y = 250;

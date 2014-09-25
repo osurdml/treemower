@@ -195,8 +195,10 @@ float DecisionTree::Mow(void)
 {
 	while (dTree[current_vx].state.budget > 1) {
 		// DEBUG
-		std::cout << std::setw(8) << dTree[current_vx].state.budget;
-		std::cout << "\n";
+		if (PRINT_DEBUG) {
+			std::cout << std::setw(8) << dTree[current_vx].state.budget;
+			std::cout << "\n";
+		}
 
 		LookAhead(current_vx, num_lookahead);
 		state_t target_state = dTree[FindBest(current_vx)].state;   // Some location way out there.
