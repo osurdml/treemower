@@ -150,6 +150,8 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 	static float dx, dy, dist;
 	src_x = dTree[source_vx].state.loc.x;
 	src_y = dTree[source_vx].state.loc.y;
+	target_state.loc.x *= 1.0;
+	target_state.loc.y *= 1.0;
 	tgt_x = target_state.loc.x;
 	tgt_y = target_state.loc.y;
 	dx = tgt_x - src_x;
@@ -191,7 +193,7 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 
 float DecisionTree::Mow(void)
 {
-	while (dTree[current_vx].state.budget > 0) {
+	while (dTree[current_vx].state.budget > 1) {
 		// DEBUG
 		std::cout << std::setw(8) << dTree[current_vx].state.budget;
 		std::cout << "\n";
@@ -205,23 +207,7 @@ float DecisionTree::Mow(void)
 
 		// Sample along path to target.
 		current_vx = SampleToTarget(current_vx, target_state);
-
-		// TODO(yoos): Clean this up. This runs whatever the user wants to
-		// change about our current state and obviously disregards the
-		// generated future states.
-		//std::vector<state_t> future_states;
-		//Explore(&dTree[current_vx].state, &future_states);
-
-		// DEBUG
-		//state_t *s = &dTree[current_vx].state;
-		//std::cout << "(" << s->loc.x << ", " << s->loc.y << "): " << s->score << "\n";
-		//im.PrintDebug();
-
-		//usleep(100000);
-		//std::cout << ".";
 	}
-
-	//PrintDebug();
 
 	return dTree[current_vx].state.score;
 }

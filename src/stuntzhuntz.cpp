@@ -9,15 +9,9 @@ StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long loo
 
 long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score, float budget)
 {
-	const int CHOICE_PER = 100;   // Probability in percent that a generated decision will be added to future states.
-
-	if ((rand() % 100) < CHOICE_PER) {
-		state_t d = {{x, y}, score, budget};
-		states->push_back(d);
-		return 1;
-	}
-
-	return 0;
+	state_t d = {{x, y}, score, budget};
+	states->push_back(d);
+	return 1;
 }
 
 long StuntzHuntz::AddDecisions(state_t *state, float step_dist, float branch_num, std::vector<state_t> *states)
@@ -41,57 +35,45 @@ long StuntzHuntz::AddDecisions(state_t *state, float step_dist, float branch_num
 
 long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 {
-	static long x, y, nc;
+	static long x, y;
 	static float step_dist, branch_num;
 	x = state->loc.x;
 	y = state->loc.y;
-	nc = 0;
 	step_dist = SAMPLE_INTERVAL;
 	branch_num = BRANCH_FACTOR*sqrt(step_dist);
 
-	if (false) {
-		// Calculate step distance based on nearby scores.
-		step_dist = fmax(fmin(5/im.score(x,y,SAMPLE_RADIUS), 400), SAMPLE_INTERVAL);
-		branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+	//step_dist = fmax(fmin(5/im.score(x,y,SAMPLE_RADIUS), 400), SAMPLE_INTERVAL);
+	//branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
 
-		// TODO(yoos): Okay, might want to move step_dist back to decisiontree if this works.
-		while (states->size() == 0) {
-			nc = 0;
-			// Generate future states by distance and angle.
-			std::vector<state_t> probe_states;
-			nc += AddDecisions(state, step_dist, branch_num, &probe_states);
+	std::vector<state_t> maybe_states;   // Temporary states to examine
+	do {
+		// Generate future states by distance and angle.
+		maybe_states.clear();
+		AddDecisions(state, step_dist, branch_num, &maybe_states);
 
-			// Check if probed state satisfies criteria (TODO: what?)
-			for (std::vector<state_t>::iterator it=probe_states.begin(); it!=probe_states.end(); it++) {
-				if (im.score(it->loc.x, it->loc.y, SAMPLE_RADIUS) > UNCERTAINTY_THRESHOLD) {
-					states->push_back(*it);
-				}
-			}
-
-			// Increase step_dist to try and find better pasture.
-			step_dist += SAMPLE_INTERVAL;
-			branch_num = BRANCH_FACTOR*sqrt(step_dist);
-
-			// If we can't find anything, just go somewhere.
-			if (step_dist > 500) {
-				step_dist = 20;   // Arbitrary. I'm really hoping this never happens.
-				branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
-
-				// Generate future states by distance and angle.
-				nc += AddDecisions(state, step_dist, branch_num, states);
-				break;
+		// Keep states that exceed a threshold.
+		for (std::vector<state_t>::iterator it=maybe_states.begin(); it!=maybe_states.end(); it++) {
+			if (im.score(it->loc.x, it->loc.y, SAMPLE_RADIUS) > UNCERTAINTY_THRESHOLD) {
+				states->push_back(*it);
 			}
 		}
-	}
-	else {
-		// Generate future states by distance from current location.
-		nc += AddDecisions(state, step_dist, branch_num, states);
+
+		// Increase step_dist to try and find better pasture.
+		step_dist += SAMPLE_INTERVAL;
+		branch_num = BRANCH_FACTOR*sqrt(step_dist);
+	} while (states->size() == 0 && maybe_states.size() != 0 && step_dist <= state->budget);
+
+	// Wander?
+	if (states->size() == 0) {
+		step_dist = fmin(rand() % 500, state->budget);
+		branch_num = BRANCH_FACTOR*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+		AddDecisions(state, step_dist, branch_num, states);
 	}
 
 	// Depreciate cost in and around visited location.
 	DepreciateScore(state);
 
-	return nc;
+	return states->size();
 }
 
 vx_t StuntzHuntz::FindBest(vx_t source_vx)
