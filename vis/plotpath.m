@@ -6,7 +6,7 @@ function exitcode = plotpath(scoremap_fn, path_fn)
 	map = zeros(100,100);
 
 	figure;
-	contour(scoremap, 50);
+	contour(scoremap, 10);
 	hold on
 	grid on
 	xlabel('X');
