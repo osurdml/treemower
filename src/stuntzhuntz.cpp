@@ -16,20 +16,20 @@ long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, floa
 
 long StuntzHuntz::AddDecisions(state_t *state, float step_dist, float branch_num, std::vector<state_t> *states)
 {
-	static long x, y, dx, dy, nc;
+	static long x, y, dx, dy;
+	long _branch_num = branch_num;
 	x = state->loc.x;
 	y = state->loc.y;
-	nc = 0;
 
-	for (int i=0; i<branch_num; i++) {
-		dx = (step_dist * cos(2*M_PI/branch_num*i));
-		dy = (step_dist * sin(2*M_PI/branch_num*i));
+	for (int i=0; i<_branch_num; i++) {
+		dx = step_dist * cos(2*M_PI/_branch_num*i);
+		dy = step_dist * sin(2*M_PI/_branch_num*i);
 		if (im.depth(x+dx, y+dy) >= 0) {
-			nc += AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-step_dist);
+			AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-step_dist);
 		}
 	}
 
-	return nc;
+	return states->size();
 }
 
 long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)

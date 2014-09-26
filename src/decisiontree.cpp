@@ -22,7 +22,6 @@ DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, 
 	dTree[root_vx].state.score = 0;
 	dTree[root_vx].state.budget = budget;
 	current_vx = root_vx;
-	//frontier.push_back(current_vx);
 }
 
 long DecisionTree::LookAhead(vx_t source_vx, long depth)
