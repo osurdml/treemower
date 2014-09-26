@@ -31,8 +31,7 @@ long Lawnmower::Explore(state_t *state, std::vector<state_t> *states)
 		//std::cout << "Down\n";
 		y -= SAMPLE_INTERVAL;
 	}
-	//else if (im.visited(x+SAMPLE_INTERVAL,y) == 0) {
-	else if (y == 0 || y == MAP_Y) {
+	else if (im.visited(x+SAMPLE_INTERVAL,y) == 0) {
 		// Across
 		//std::cout << "Across\n";
 		x += SAMPLE_INTERVAL;

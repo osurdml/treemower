@@ -169,6 +169,7 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 		boost::add_edge(parent_vx, new_vx, dTree);
 		dTree[new_vx].parent = parent_vx;
 		dTree[new_vx].state = (state_t) {{src_x,src_y}, CalcScore(&dTree[parent_vx].state), dTree[parent_vx].state.budget-dist/num_steps};
+		im.visit(src_x, src_y);
 		DepreciateScore(&dTree[parent_vx].state);
 	}
 
