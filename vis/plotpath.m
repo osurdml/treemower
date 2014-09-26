@@ -13,3 +13,5 @@ function exitcode = plotpath(scoremap_fn, path_fn)
 	ylabel('Y');
 	line(x,y,'Color','b','LineWidth',1,'Marker','.');
 
+	exitcode = 0;
+end
