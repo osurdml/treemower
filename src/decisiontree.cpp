@@ -150,8 +150,6 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 	static float dx, dy, dist;
 	src_x = dTree[source_vx].state.loc.x;
 	src_y = dTree[source_vx].state.loc.y;
-	target_state.loc.x *= 1.0;
-	target_state.loc.y *= 1.0;
 	tgt_x = target_state.loc.x;
 	tgt_y = target_state.loc.y;
 	dx = tgt_x - src_x;
