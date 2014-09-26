@@ -37,7 +37,7 @@ const float UNCERTAINTY_REDUCE_FACTOR = 0.5;
 const float UNCERTAINTY_REDUCE_EXP = 1.0;
 
 // Uncertainty below this is "good enough."
-const float UNCERTAINTY_THRESHOLD = 2.0;
+const float UNCERTAINTY_THRESHOLD = 0.2;
 
 #endif // CONFIG_HPP
 
