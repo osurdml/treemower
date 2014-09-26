@@ -137,9 +137,9 @@ void DecisionTree::DepreciateScore(const state_t *state)
 			dist = sqrt(pow(dx,2)+pow(dy,2));
 			if (dist <= SAMPLE_RADIUS) {
 				reduce_factor = UNCERTAINTY_REDUCE_FACTOR;
+				reduce_factor *= pow(UNCERTAINTY_REDUCE_EXP,(int)dist);
+				im.set_score(x+dx,y+dy, reduce_factor * im.score(x+dx,y+dy));
 			}
-			reduce_factor *= pow(UNCERTAINTY_REDUCE_EXP,(int)dist);
-			im.set_score(x+dx,y+dy, reduce_factor * im.score(x+dx,y+dy));
 		}
 	}
 }
