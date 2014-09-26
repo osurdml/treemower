@@ -37,10 +37,11 @@ float InfoMap::score(long x, long y, float radius) const
 {
 	float sum = 0.0;
 	long count = 0;
+	long _radius = radius;   // TODO(syoo): round up?
 
 	float dist;
-	for (long dx=-radius; dx<=radius; dx++) {
-		for (long dy=-radius; dy<=radius; dy++) {
+	for (long dx=-_radius; dx<=_radius; dx++) {
+		for (long dy=-_radius; dy<=_radius; dy++) {
 			dist = sqrt(pow(dx,2)+pow(dy,2));
 			if (dist <= radius) {
 				count++;
