@@ -181,14 +181,6 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 	assert(dTree[new_vx].state.loc.x == target_state.loc.x);
 	assert(dTree[new_vx].state.loc.y == target_state.loc.y);
 
-	// DEBUG
-	//parent_vx = source_vx;
-	//new_vx = boost::add_vertex(dTree);
-	//boost::add_edge(source_vx, new_vx, dTree);
-	//dTree[new_vx].parent = source_vx;
-	//dTree[new_vx].state = target_state;
-	//DepreciateScore(&dTree[new_vx].state);
-
 	return new_vx;
 }
 
