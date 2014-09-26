@@ -9,6 +9,7 @@ function exitcode = plotpath(scoremap_fn, path_fn)
 	contour(scoremap, 10);
 	hold on
 	grid on
+	title(scoremap_fn)
 	xlabel('X');
 	ylabel('Y');
 	line(x,y,'Color','b','LineWidth',1,'Marker','.');

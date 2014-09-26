@@ -9,6 +9,7 @@ function exitcode = animpath(scoremap_fn, path_fn)
 	hold on
 	grid on
 	%axis manual %// prevent axis from auto-scaling
+	title(scoremap_fn)
 	xlabel('X');
 	ylabel('Y');
 
