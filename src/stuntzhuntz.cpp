@@ -32,7 +32,6 @@ long StuntzHuntz::AddDecisions(state_t *state, float step_dist, float branch_num
 	return nc;
 }
 
-
 long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 {
 	static long x, y;
@@ -87,7 +86,7 @@ vx_t StuntzHuntz::FindBest(vx_t source_vx)
 			vx_t child_vx = boost::target(*edges.first, dTree);
 			float child_score = dTree[FindBest(child_vx)].state.score;
 
-			if (child_score >= best_score) {
+			if (child_score > best_score) {
 				best_vx = child_vx;
 				best_score = child_score;
 			}
