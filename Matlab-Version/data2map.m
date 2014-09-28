@@ -1,26 +1,38 @@
 function exitcode = data2map(in_fn, out_fn)
-	MAPSCALE = 300000;   % Magic number
-	load(in_fn); % load the data, change the name pls.
+	UNIT_LENGTH = 4;   % Distance in meters per map unit.
+	SAMPLE_RADIUS = 30;   % Radius of sample area in map units.
+
+	% Fetch data
+	fprintf('Loading data\n');
 	format long;
-	radius = 30; % this could be change to different radius.
+	load(in_fn);
 	lon = Longitude(:);
 	lat = Latitude(:);
-	origin = [min(lon(:)), min(lat(:))]
 
-	% TODO(syoo): haversine
-	map_x = MAPSCALE * (max(lon(:)) - min(lon(:)));
-	map_y = MAPSCALE * (max(lat(:)) - min(lat(:)));
+	% Calculate some dimensions
+	fprintf('Calculating dimensions\n');
+	origin = [min(lat), min(lon)];
+	nigiro = [max(lat), max(lon)];   % Corner opposite origin
+	map_x = 1000 * haversine([origin(1), nigiro(2)], origin);   % Using origin lat
+	map_y = 1000 * haversine([nigiro(1), origin(2)], origin);   % Using origin lon
+	x_scale = map_x / UNIT_LENGTH / (nigiro(2)-origin(2));
+	y_scale = map_y / UNIT_LENGTH / (nigiro(1)-origin(1));
+
+	% Build map
+	fprintf('Building map\n');
 	map = ones(map_y, map_x);
-
 	%matlabpool open 4;
 	for i = 1:30:length(lat)
-		fprintf('%d/%d\n', i, length(lat));
-		x = round(MAPSCALE * (lon(i) - origin(1))) + 1;
-		y = round(MAPSCALE * (lat(i) - origin(2))) + 1;
-		for dx = -radius:radius
-			for dy = -radius:radius
+		% Calculate location in meters relative to origin
+		x = 1 + round(x_scale * (lon(i) - origin(2)));
+		y = 1 + round(y_scale * (lat(i) - origin(1)));
+		fprintf('%d/%d: (%d, %d)\n', i, length(lat), x, y);
+
+		% Calculate sample area
+		for dx = -SAMPLE_RADIUS:SAMPLE_RADIUS
+			for dy = -SAMPLE_RADIUS:SAMPLE_RADIUS
 				dist = sqrt(dx^2 + dy^2);
-				if dist <= radius
+				if dist <= SAMPLE_RADIUS
 					x_ = x + dx;
 					y_ = y + dy;
 					if x_ <= map_x && x_ >= 1 && y_ <= map_y && y_ >= 1
@@ -34,4 +46,7 @@ function exitcode = data2map(in_fn, out_fn)
 	%scoremap
 	%contour(scoremap);
 	%hold on;
-	csvwrite(out_fn,map);
+	f = fopen(out_fn, 'w');
+	fprintf(f, '%d,%d\n', map_x, map_y);
+	dlmwrite(out_fn, map, '-append');
+	fclose(f);
