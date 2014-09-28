@@ -1,6 +1,6 @@
 #include <stuntzhuntz.hpp>
 
-#include <stdio.h>
+#include <iostream>
 
 StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac) :
 	DecisionTree(im_filename, rows, cols, lookahead, budget, rand_frac)
@@ -9,37 +9,70 @@ StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long loo
 
 long StuntzHuntz::AddDecision(std::vector<state_t> *states, long x, long y, float score, float budget)
 {
-	const int CHOICE_PER = 100;   // Probability in percent that a generated decision will be added to future states.
+	state_t d = {{x, y}, score, budget};
+	states->push_back(d);
+	return 1;
+}
 
-	if ((rand() % 100) < CHOICE_PER) {
-		state_t d = {{x, y}, score, budget};
-		states->push_back(d);
-		return 1;
+long StuntzHuntz::AddDecisions(state_t *state, float step_dist, float branch_num, std::vector<state_t> *states)
+{
+	static long x, y, dx, dy;
+	long _branch_num = branch_num;
+	x = state->loc.x;
+	y = state->loc.y;
+
+	for (int i=0; i<_branch_num; i++) {
+		dx = step_dist * cos(2*M_PI/_branch_num*i);
+		dy = step_dist * sin(2*M_PI/_branch_num*i);
+		if (im.depth(x+dx, y+dy) >= 0) {
+			AddDecision(states, x+dx, y+dy, CalcScore(state), state->budget-step_dist);
+		}
 	}
 
-	return 0;
+	return states->size();
 }
 
 long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 {
-	long x = state->loc.x;
-	long y = state->loc.y;
-	long nc = 0;
+	static long x, y;
+	static float step_dist, branch_num;
+	x = state->loc.x;
+	y = state->loc.y;
+	step_dist = SAMPLE_INTERVAL;
+	branch_num = BRANCH_FACTOR*sqrt(step_dist);
 
-	// Examine surrounding eight cells for possible exploration.
-	for (int i=-1; i<2; i++) {
-		for (int j=-1; j<2; j++) {
-			if (im.depth(x+i, y+j) >= 0 && !(i == 0 && j == 0)) {
-				//std::cout << x+i << ", " << y+j << "\n";
-				nc += AddDecision(states, x+i, y+j, CalcScore(state), state->budget-std::sqrt(std::pow(i,2)+std::pow(j,2)));
+	//step_dist = fmax(fmin(5/im.score(x,y,SAMPLE_RADIUS), 400), SAMPLE_INTERVAL);
+	//branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+
+	std::vector<state_t> maybe_states;   // Temporary states to examine
+	do {
+		// Generate future states by distance and angle.
+		maybe_states.clear();
+		AddDecisions(state, step_dist, branch_num, &maybe_states);
+
+		// Keep states that exceed a threshold.
+		for (std::vector<state_t>::iterator it=maybe_states.begin(); it!=maybe_states.end(); it++) {
+			if (im.score(it->loc.x, it->loc.y, SAMPLE_RADIUS) > UNCERTAINTY_THRESHOLD) {
+				states->push_back(*it);
 			}
 		}
+
+		// Increase step_dist to try and find better pasture.
+		step_dist += SAMPLE_INTERVAL;
+		branch_num = BRANCH_FACTOR*sqrt(step_dist);
+	} while (states->size() == 0 && maybe_states.size() != 0 && step_dist <= state->budget);
+
+	// Wander?
+	if (states->size() == 0) {
+		step_dist = fmin(rand() % 500, state->budget);
+		branch_num = BRANCH_FACTOR*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+		AddDecisions(state, step_dist, branch_num, states);
 	}
 
 	// Depreciate cost in and around visited location.
 	DepreciateScore(state);
 
-	return nc;
+	return states->size();
 }
 
 vx_t StuntzHuntz::FindBest(vx_t source_vx)
@@ -52,7 +85,8 @@ vx_t StuntzHuntz::FindBest(vx_t source_vx)
 		for(; edges.first != edges.second; edges.first++) {
 			vx_t child_vx = boost::target(*edges.first, dTree);
 			float child_score = dTree[FindBest(child_vx)].state.score;
-			if (child_score >= best_score) {
+
+			if (child_score > best_score) {
 				best_vx = child_vx;
 				best_score = child_score;
 			}

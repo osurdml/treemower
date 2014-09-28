@@ -1,6 +1,7 @@
 #include <lawnmower.hpp>
 
 #include <stdio.h>
+#include <iostream>
 
 Lawnmower::Lawnmower(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac) :
 	DecisionTree(im_filename, rows, cols, lookahead, budget, rand_frac)
@@ -19,35 +20,35 @@ long Lawnmower::Explore(state_t *state, std::vector<state_t> *states)
 {
 	long x = state->loc.x;
 	long y = state->loc.y;
-	long nc = 0;
 
-	if (im.visited(x,y+1) == 0) {
+	if (im.visited(x,y+SAMPLE_INTERVAL) == 0) {
 		// Up
 		//std::cout << "Up\n";
-		nc += AddDecision(states, x, y+1, CalcScore(state), state->budget-1);
+		y += SAMPLE_INTERVAL;
 	}
-	else if (im.visited(x,y-1) == 0) {
+	else if (im.visited(x,y-SAMPLE_INTERVAL) == 0) {
 		// Down
 		//std::cout << "Down\n";
-		nc += AddDecision(states, x, y-1, CalcScore(state), state->budget-1);
+		y -= SAMPLE_INTERVAL;
 	}
-	else if (im.visited(x+1,y) == 0) {
+	else if (im.visited(x+SAMPLE_INTERVAL,y) == 0) {
 		// Across
 		//std::cout << "Across\n";
-		nc += AddDecision(states, x+1, y, CalcScore(state), state->budget-1);
+		x += SAMPLE_INTERVAL;
 	}
 	else {
 		// End
 		//std::cout << "End\n";
 	}
 
+	AddDecision(states, x, y, CalcScore(state), state->budget-SAMPLE_INTERVAL);
 	im.visit(x,y);
 	DepreciateScore(state);
 
 	// Debug
 	//im.PrintDebug();
 
-	return nc;
+	return 1;
 }
 
 vx_t Lawnmower::FindBest(vx_t source_vx)

@@ -1,6 +1,8 @@
 #include <decisiontree.hpp>
 
 #include <fstream>
+#include <iostream>
+#include <iomanip>
 
 #include <boost/bind.hpp>
 
@@ -15,12 +17,11 @@ DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, 
 	// Add base vertex.
 	root_vx = boost::add_vertex(dTree);
 	dTree[root_vx].parent = 0;
-	dTree[root_vx].state.loc.x = 0;
-	dTree[root_vx].state.loc.y = 0;
+	dTree[root_vx].state.loc.x = START_X;
+	dTree[root_vx].state.loc.y = START_Y;
 	dTree[root_vx].state.score = 0;
 	dTree[root_vx].state.budget = budget;
 	current_vx = root_vx;
-	//frontier.push_back(current_vx);
 }
 
 long DecisionTree::LookAhead(vx_t source_vx, long depth)
@@ -119,67 +120,89 @@ float DecisionTree::CalcScore(const state_t *state)
 	long x = state->loc.x;
 	long y = state->loc.y;
 
-	// This assumes BaseMap::score() returns -1 if coordinates are invalid, in
-	// which case we ignore the score.
-	float s = state->score +
-		std::max(0.0f, im.score(x, y)) +
-		std::max(0.0f, im.score(x, y+1)) +
-		std::max(0.0f, im.score(x, y-1)) +
-		std::max(0.0f, im.score(x+1, y)) +
-		std::max(0.0f, im.score(x-1, y));
-
-	return s;
+	return state->score + im.score(x, y, SAMPLE_RADIUS);
 }
 
 void DecisionTree::DepreciateScore(const state_t *state)
 {
-	const float REDUCE_PER = 0.5;
-
 	long x = state->loc.x;
 	long y = state->loc.y;
 
-	// Reduce score of this cell and some surrounding cells.
-	im.set_score(x,y,   REDUCE_PER * im.score(x,y));
-	im.set_score(x,y+1, REDUCE_PER * im.score(x,y+1));
-	im.set_score(x,y-1, REDUCE_PER * im.score(x,y-1));
-	im.set_score(x+1,y, REDUCE_PER * im.score(x+1,y));
-	im.set_score(x-1,y, REDUCE_PER * im.score(x-1,y));
+	// Depreciate score per distance from current location.
+	float reduce_factor = 1.0;
+	float dist;
+	for (int dx=-SAMPLE_RADIUS; dx<=SAMPLE_RADIUS; dx++) {
+		for (int dy=-SAMPLE_RADIUS; dy<=SAMPLE_RADIUS; dy++) {
+			dist = sqrt(pow(dx,2)+pow(dy,2));
+			if (dist <= SAMPLE_RADIUS) {
+				reduce_factor = UNCERTAINTY_REDUCE_FACTOR * pow(UNCERTAINTY_REDUCE_EXP,(int)dist);
+				im.set_score(x+dx,y+dy, reduce_factor * im.score(x+dx,y+dy));
+			}
+		}
+	}
+}
 
-	// Maybe depreciate more cells?
-	//for (int i=-1; i<2; i++) {
-	//	for (int j=-1; j<2; j++) {
-	//		im.set_score(x+i,y+j,   REDUCE_PER * im.score(x+i,y+j));
-	//	}
-	//}
+vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
+{
+	static long src_x, src_y, tgt_x, tgt_y, num_steps;
+	static float dx, dy, dist;
+	src_x = dTree[source_vx].state.loc.x;
+	src_y = dTree[source_vx].state.loc.y;
+	tgt_x = target_state.loc.x;
+	tgt_y = target_state.loc.y;
+	dx = tgt_x - src_x;
+	dy = tgt_y - src_y;
+	dist = sqrt(pow(dx,2)+pow(dy,2));
+	num_steps = fmax(1, (dist+0.5)/SAMPLE_INTERVAL);
+
+	vx_t parent_vx;
+	vx_t new_vx = source_vx;
+
+	for (long i=0; i<num_steps; i++) {
+		// Step forward.
+		src_x = dTree[source_vx].state.loc.x + dx*(i+1)/num_steps;
+		src_y = dTree[source_vx].state.loc.y + dy*(i+1)/num_steps;
+		parent_vx = new_vx;
+		new_vx = boost::add_vertex(dTree);
+
+		// Add new stuff to graph.
+		boost::add_edge(parent_vx, new_vx, dTree);
+		dTree[new_vx].parent = parent_vx;
+		dTree[new_vx].state = (state_t) {{src_x,src_y}, CalcScore(&dTree[parent_vx].state), dTree[parent_vx].state.budget-dist/num_steps};
+
+		// The following is to do whatever the explorer normally does to update
+		// the state. Of course, it unnecessarily generates new states, so
+		// there's room for improvement here.
+		std::vector<state_t> fs;
+		Explore(&dTree[parent_vx].state, &fs);
+	}
+
+	// We shouldn't have floating point errors.
+	assert(dTree[new_vx].state.loc.x == target_state.loc.x);
+	assert(dTree[new_vx].state.loc.y == target_state.loc.y);
+
+	return new_vx;
 }
 
 float DecisionTree::Mow(void)
 {
-	while (dTree[current_vx].state.budget > 0) {
+	while (dTree[current_vx].state.budget > 1) {
+		// DEBUG
+		if (PRINT_DEBUG) {
+			std::cout << std::setw(8) << dTree[current_vx].state.budget;
+			std::cout << "\n";
+		}
+
 		LookAhead(current_vx, num_lookahead);
-		vx_t best_vx = FindBest(current_vx);
-		Prune(current_vx, best_vx);   // Prune all nodes excluding best_vx
-		current_vx = best_vx;
+		state_t target_state = dTree[FindBest(current_vx)].state;   // Some location way out there.
+		Prune(current_vx, 0);   // Prune all branches
 
 		// Step costmap forward.
 		im.Step(1);
-		// TODO(yoos): Clean this up. This runs whatever the user wants to
-		// change about our current state and obviously disregards the
-		// generated future states.
-		std::vector<state_t> future_states;
-		Explore(&dTree[current_vx].state, &future_states);
 
-		// DEBUG
-		//state_t *s = &dTree[current_vx].state;
-		//std::cout << "(" << s->loc.x << ", " << s->loc.y << "): " << s->score << "\n";
-		//im.PrintDebug();
-
-		//usleep(100000);
-		std::cout << ".";
+		// Sample along path to target.
+		current_vx = SampleToTarget(current_vx, target_state);
 	}
-
-	std::cout << std::endl;
-	//PrintDebug();
 
 	return dTree[current_vx].state.score;
 }
@@ -193,18 +216,23 @@ void DecisionTree::Export(const char *out_filename)
 		std::cerr << "Failed to open file " << out_filename << std::endl;
 	}
 
-	std::cout << "Exporting " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
+	//std::cout << "Exporting " << boost::num_edges(dTree) << " edges, " << boost::num_vertices(dTree) << " vertices." << std::endl;
 
 	// Write to file.
 	vx_t print_vx = root_vx;
 	location_t loc = dTree[root_vx].state.loc;
-	ofs << loc.x << "," << loc.y << "\n";
+	float score = dTree[root_vx].state.score;
+	float budget = dTree[root_vx].state.budget;
+	ofs << "X,Y,Budget,Score\n";
+	ofs << loc.x << ',' << loc.y << ',' << budget << ',' << score << "\n";
 
 	while (boost::out_degree(print_vx, dTree) != 0) {
 		edge_t e = *boost::out_edges(print_vx, dTree).first;
 		print_vx = boost::target(e, dTree);
 		loc = dTree[print_vx].state.loc;
-		ofs << loc.x << "," << loc.y << "\n";
+		score = dTree[print_vx].state.score;
+		budget = dTree[print_vx].state.budget;
+		ofs << loc.x << ',' << loc.y << ',' << budget << ',' << score << "\n";
 	}
 
 	ofs.close();

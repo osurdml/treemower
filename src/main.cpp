@@ -8,26 +8,36 @@
 
 int main(int argc, char **argv)
 {
-	if (argc < 2) {
-		std::cout << "Usage: " << argv[0] << " <CSV costmap>" << std::endl;
+	if (argc < 7) {
+		std::cout << "Usage: " << argv[0] << " <CSV costmap> <rh | lm> <lookahead> <budget> <random choice fraction> <output filename>" << std::endl;
+
 		return 1;
 	}
 
-	std::cout << "Running Treemower." << std::endl;
+	//std::cout << "Running Treemower." << std::endl;
 
 	// Get costmap file.
+	MAP_X = 500;
+	MAP_Y = 500;
 	const char *cm_filename = argv[1];
-	long rows = 100;
-	long cols = 100;
-	int lookahead = 2;
-	Lawnmower lm(cm_filename, rows, cols, lookahead, 4000, 1.0);
-	StuntzHuntz sh(cm_filename, rows, cols, lookahead, 4000, 0.5);
 
-	printf("Lawn score: %f\n", lm.Mow());
-	printf("RH score: %f\n", sh.Mow());
+	LOOKAHEAD = atol(argv[3]);
+	BUDGET = atol(argv[4]);
+	RAND_FRAC = atof(argv[5]);
 
-	lm.Export("output/lm.out");
-	sh.Export("output/sh.out");
+	std::string alg = argv[2];
+	std::string out_fn = argv[6];
+
+	DecisionTree *dt;
+	if (alg == "rh") {
+		dt = new StuntzHuntz(cm_filename, MAP_X, MAP_Y, LOOKAHEAD, BUDGET, RAND_FRAC);
+	}
+	else {
+		dt = new Lawnmower(cm_filename, MAP_X, MAP_Y, LOOKAHEAD, BUDGET, RAND_FRAC);
+	}
+
+	std::cout << dt->Mow();
+	dt->Export(out_fn.c_str());
 
 	return 0;
 }

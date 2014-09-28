@@ -33,6 +33,27 @@ float InfoMap::score(long x, long y) const
 	return MatrixGet(&_score, x, y);
 }
 
+float InfoMap::score(long x, long y, float radius) const
+{
+	float sum = 0.0;
+	long count = 0;
+	long _radius = radius;   // TODO(syoo): round up?
+
+	float dist;
+	for (long dx=-_radius; dx<=_radius; dx++) {
+		for (long dy=-_radius; dy<=_radius; dy++) {
+			dist = sqrt(pow(dx,2)+pow(dy,2));
+			if (dist <= radius) {
+				count++;
+				sum += std::max(0.0f, MatrixGet(&_score, x+dx, y+dy));
+			}
+		}
+	}
+	sum /= count;
+
+	return sum;
+}
+
 float InfoMap::depth(long x, long y) const
 {
 	return MatrixGet(&_depth, x, y);
