@@ -18,6 +18,11 @@ std::pair<long, long> InfoMap::size(void) const
 	return _size;
 }
 
+std::pair<float, float> InfoMap::origin(void) const
+{
+	return _origin;
+}
+
 float InfoMap::visited(long x, long y) const
 {
 	return MatrixGet(&_visited, x, y);

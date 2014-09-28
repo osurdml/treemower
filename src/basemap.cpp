@@ -20,15 +20,18 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, lon
 		std::cerr << "Failed to open file " << mat_fn << std::endl;
 	}
 
-	// Get map size
+	// Get map information
 	std::string line, field;
 	std::getline(mat_fs, line);
 	std::istringstream s(line);
-	std::string _xsize, _ysize;
+	std::string _xsize, _ysize, _originx, _originy;
 	std::getline(s, _xsize, ',');
 	std::getline(s, _ysize, ',');
+	std::getline(s, _originx, ',');
+	std::getline(s, _originy, ',');
 	xsize = atol(_xsize.c_str());
 	ysize = atol(_ysize.c_str());
+	_origin = std::pair<float, float>(atof(_originx.c_str()), atof(_originy.c_str()));
 
 	// Get map data
 	(*m).resize(ysize, xsize);

@@ -223,16 +223,21 @@ void DecisionTree::Export(const char *out_filename)
 	location_t loc = dTree[root_vx].state.loc;
 	float score = dTree[root_vx].state.score;
 	float budget = dTree[root_vx].state.budget;
-	ofs << "X,Y,Budget,Score\n";
-	ofs << loc.x << ',' << loc.y << ',' << budget << ',' << score << "\n";
 
+	// Metadata
+	ofs << "MapX,MapY,OriginX,OriginY\n";
+	ofs << im.size().first << ',' << im.size().second << ',' << im.origin().first << ',' << im.origin().second << "\n";
+
+	// Data
+	ofs << "X,Y,Budget,Score\n";
+	ofs << UNIT_LENGTH*loc.x << ',' << UNIT_LENGTH*loc.y << ',' << budget << ',' << score << "\n";
 	while (boost::out_degree(print_vx, dTree) != 0) {
 		edge_t e = *boost::out_edges(print_vx, dTree).first;
 		print_vx = boost::target(e, dTree);
 		loc = dTree[print_vx].state.loc;
 		score = dTree[print_vx].state.score;
 		budget = dTree[print_vx].state.budget;
-		ofs << loc.x << ',' << loc.y << ',' << budget << ',' << score << "\n";
+		ofs << UNIT_LENGTH*loc.x << ',' << UNIT_LENGTH*loc.y << ',' << budget << ',' << score << "\n";
 	}
 
 	ofs.close();

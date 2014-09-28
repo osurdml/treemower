@@ -48,6 +48,6 @@ function exitcode = data2map(in_fn, out_fn)
 	%contour(scoremap);
 	%hold on;
 	f = fopen(out_fn, 'w');
-	fprintf(f, '%d,%d\n', map_x, map_y);
+	fprintf(f, '%d,%d,%f,%f\n', map_x, map_y, origin(1), origin(2));
 	dlmwrite(out_fn, map, '-append');
 	fclose(f);

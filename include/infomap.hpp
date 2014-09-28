@@ -7,7 +7,6 @@
 #include <vector>
 
 class InfoMap : public BaseMap {
-	std::pair<long, long> _size;
 	std::vector<MatrixXf> _visited;
 
 	std::vector<MatrixXf> _score;
@@ -19,6 +18,7 @@ public:
 	InfoMap(const char *score_fn, const char *depth_fn, const char *temperature_fn, const char *oxygen_fn, long num_lookahead);
 
 	std::pair<long, long> size(void) const;
+	std::pair<float, float> origin(void) const;
 	float visited(long x, long y) const;
 	int visit(long x, long y);
 
