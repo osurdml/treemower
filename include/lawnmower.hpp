@@ -1,7 +1,6 @@
 #ifndef LAWNMOWER_HPP
 #define LAWNMOWER_HPP
 
-#include <costmap.hpp>
 #include <decisiontree.hpp>
 
 #include <stdlib.h>

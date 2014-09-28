@@ -1,7 +1,6 @@
 #ifndef STUNTZHUNTZ_HPP
 #define STUNTZHUNTZ_HPP
 
-#include <costmap.hpp>
 #include <decisiontree.hpp>
 
 #include <stdlib.h>
