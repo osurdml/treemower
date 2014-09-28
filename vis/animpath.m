@@ -1,15 +1,20 @@
-function exitcode = animpath(scoremap_fn, path_fn)
-	scoremap = csvread(scoremap_fn);
-	M = csvread(path_fn);
-	x = M(:,1);
-	y = M(:,2);
-	map = zeros(100,100);
+function exitcode = animpath(map_fn, path_fn)
+	map = csvread(map_fn);
+	path = csvread(path_fn);
+
+	% Get map dimentions from first row
+	map_x = map(1,1);
+	map_y = map(1,2);
+	map = map(2:end, :).';   % Transpose
+	path = path(2:end, :);
+	x = path(:,1);
+	y = path(:,2);
+
 	figure;
-	contour3(scoremap, 50);
+	contour3(map, 50);
 	hold on
 	grid on
-	%axis manual %// prevent axis from auto-scaling
-	title(scoremap_fn)
+	title(map_fn)
 	xlabel('X');
 	ylabel('Y');
 
@@ -19,7 +24,7 @@ function exitcode = animpath(scoremap_fn, path_fn)
 		py1 = y(i)+1;
 		px2 = x(i+1)+1;
 		py2 = y(i+1)+1;
-		plot3([py1 py2], [px1 px2], [scoremap(py1, px1) scoremap(py2, px2)], 'Color','b','LineWidth',1,'Marker','.');
+		plot3([px1 px2], [py1 py2], [map(py1, px1) map(py2, px2)], 'Color','b','LineWidth',1,'Marker','.');
 		pause(0.001)
 	end
 
