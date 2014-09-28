@@ -14,7 +14,6 @@ fields, generate the map using data2map.m. Invocation in Matlab is as follows:
 
 ```
 data2map(<PATH TO DATA FILE>, 'data/out.map')
-
 ```
 
 If you wish to generate a simulated map, fiddle with the settings in
@@ -28,7 +27,6 @@ Once you have a map, run treemower as follows to generate a path:
 ```
 ./treemower <CSV costmap> <rh | lm> <lookahead> <budget> <random choice
 fraction> <output filename>
-
 ```
 
 For example, to use the receding horizon path planner on `data/lake.map` with
@@ -37,7 +35,6 @@ command might look something like this:
 
 ```
 ./treemower data/lake.map rh 3 5000 1.0 output/lake.path
-
 ```
 
 1 unit of the travel budget corresponds to 1 tick or cell in the map that is
