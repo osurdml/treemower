@@ -10,7 +10,8 @@ Generate maps
 Maps can come from either hardware tests or from a our simulator.
 
 If you have a Matlab file with data from the boat with Latitude and Longitude
-fields, generate the map using data2map.m. Invocation in Matlab is as follows:
+fields, generate the map using `tools/data2map.m`. Invocation in Matlab is as
+follows:
 
 ```
 data2map(<PATH TO DATA FILE>, 'data/out.map')
