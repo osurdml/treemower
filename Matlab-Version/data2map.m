@@ -2,7 +2,7 @@ function exitcode = data2map(in_fn, out_fn)
 	MAPSCALE = 300000;   % Magic number
 	load(in_fn); % load the data, change the name pls.
 	format long;
-	radius = 100; % this could be change to different radius.
+	radius = 30; % this could be change to different radius.
 	lon = Longitude(:);
 	lat = Latitude(:);
 	origin = [min(lon(:)), min(lat(:))]
@@ -10,10 +10,10 @@ function exitcode = data2map(in_fn, out_fn)
 	% TODO(syoo): haversine
 	map_x = MAPSCALE * (max(lon(:)) - min(lon(:)));
 	map_y = MAPSCALE * (max(lat(:)) - min(lat(:)));
-	map = ones(map_x, map_y);
+	map = ones(map_y, map_x);
 
 	%matlabpool open 4;
-	for i = 1:length(lat)
+	for i = 1:30:length(lat)
 		fprintf('%d/%d\n', i, length(lat));
 		x = round(MAPSCALE * (lon(i) - origin(1))) + 1;
 		y = round(MAPSCALE * (lat(i) - origin(2))) + 1;
@@ -24,7 +24,7 @@ function exitcode = data2map(in_fn, out_fn)
 					x_ = x + dx;
 					y_ = y + dy;
 					if x_ <= map_x && x_ >= 1 && y_ <= map_y && y_ >= 1
-						map(x_,y_) = 0.5 * map(x_,y_);
+						map(y_,x_) = 0.5 * map(y_,x_);
 					end
 				end
 			end
