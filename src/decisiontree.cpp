@@ -186,7 +186,7 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 
 float DecisionTree::Mow(void)
 {
-	while (dTree[current_vx].state.budget > 1) {
+	while (dTree[current_vx].state.budget > SAMPLE_INTERVAL) {
 		// DEBUG
 		if (PRINT_DEBUG) {
 			std::cout << std::setw(8) << dTree[current_vx].state.budget;
