@@ -25,8 +25,7 @@ Generate paths
 Once you have a map, run treemower as follows to generate a path:
 
 ```
-./treemower <CSV costmap> <rh | lm> <lookahead> <budget> <random choice
-fraction> <output filename>
+./treemower <CSV costmap> <rh | lm> <lookahead> <budget> <random choice fraction> <output filename>
 ```
 
 For example, to use the receding horizon path planner on `data/lake.map` with
