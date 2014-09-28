@@ -6,8 +6,8 @@
 
 #include <boost/bind.hpp>
 
-DecisionTree::DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead, float budget, float rand_frac) :
-	im(im_filename, im_filename, im_filename, im_filename, im_rows, im_cols, num_lookahead)   // TODO(yoos): Actually use separate data
+DecisionTree::DecisionTree(const char *im_filename, long num_lookahead, float budget, float rand_frac) :
+	im(im_filename, im_filename, im_filename, im_filename, num_lookahead)   // TODO(yoos): Actually use separate data
 {
 	srand(3);
 

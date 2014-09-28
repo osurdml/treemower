@@ -17,8 +17,8 @@ int main(int argc, char **argv)
 	//std::cout << "Running Treemower." << std::endl;
 
 	// Get costmap file.
-	MAP_X = 500;
-	MAP_Y = 500;
+	START_X = 0;
+	START_Y = 0;
 	const char *cm_filename = argv[1];
 
 	LOOKAHEAD = atol(argv[3]);
@@ -30,10 +30,10 @@ int main(int argc, char **argv)
 
 	DecisionTree *dt;
 	if (alg == "rh") {
-		dt = new StuntzHuntz(cm_filename, MAP_X, MAP_Y, LOOKAHEAD, BUDGET, RAND_FRAC);
+		dt = new StuntzHuntz(cm_filename, LOOKAHEAD, BUDGET, RAND_FRAC);
 	}
 	else {
-		dt = new Lawnmower(cm_filename, MAP_X, MAP_Y, LOOKAHEAD, BUDGET, RAND_FRAC);
+		dt = new Lawnmower(cm_filename, LOOKAHEAD, BUDGET, RAND_FRAC);
 	}
 
 	std::cout << dt->Mow();

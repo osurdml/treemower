@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <iostream>
 
-Lawnmower::Lawnmower(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac) :
-	DecisionTree(im_filename, rows, cols, lookahead, budget, rand_frac)
+Lawnmower::Lawnmower(const char *im_filename, long lookahead, float budget, float rand_frac) :
+	DecisionTree(im_filename, lookahead, budget, rand_frac)
 {
 }
 

@@ -1,8 +1,5 @@
 #include <config.hpp>
 
-long MAP_X = 100;
-long MAP_Y = 100;
-
 long START_X = 0;
 long START_Y = 0;
 

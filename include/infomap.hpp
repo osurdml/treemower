@@ -16,7 +16,7 @@ class InfoMap : public BaseMap {
 	MatrixXf _oxygen;
 
 public:
-	InfoMap(const char *score_fn, const char *depth_fn, const char *temperature_fn, const char *oxygen_fn, long rows, long cols, long num_lookahead);
+	InfoMap(const char *score_fn, const char *depth_fn, const char *temperature_fn, const char *oxygen_fn, long num_lookahead);
 
 	std::pair<long, long> size(void) const;
 	float visited(long x, long y) const;

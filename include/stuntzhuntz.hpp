@@ -16,7 +16,7 @@ class StuntzHuntz : public DecisionTree {
 	vx_t FindBest(vx_t source_vx);
 
 public:
-	StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac);
+	StuntzHuntz(const char *im_filename, long lookahead, float budget, float rand_frac);
 };
 
 #endif // STUNTZHUNTZ_HPP

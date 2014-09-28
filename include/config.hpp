@@ -3,10 +3,6 @@
 
 const bool PRINT_DEBUG = true;
 
-// Map size
-extern long MAP_X;
-extern long MAP_Y;
-
 // Start location
 extern long START_X;
 extern long START_Y;

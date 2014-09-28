@@ -15,7 +15,7 @@ class Lawnmower : public DecisionTree {
 	vx_t FindBest(vx_t source_vx);
 
 public:
-	Lawnmower(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac);
+	Lawnmower(const char *im_filename, long lookahead, float budget, float rand_frac);
 };
 
 #endif // LAWNMOWER_HPP

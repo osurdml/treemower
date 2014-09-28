@@ -19,9 +19,8 @@ class BaseMap {
 	std::vector<std::vector<MatrixXf>*> undo_matrices;
 
 protected:
-	// TODO(yoos): Data file should have associated metadata so we can get rid of row/col count arguments.
-	std::pair<long, long> ImportMatrix(const char *mat_fn, MatrixXf *m, long rows, long cols);
-	std::pair<long, long> ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long rows, long cols, long max_undo);
+	std::pair<long, long> ImportMatrix(const char *mat_fn, MatrixXf *m, long rows = 0, long cols = 0);
+	std::pair<long, long> ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long max_undo, long rows = 0, long cols = 0);
 
 	// Get/set
 	float MatrixGet(const MatrixXf *m, long x, long y) const;

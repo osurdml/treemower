@@ -14,7 +14,7 @@ class CostMap : public BaseMap {
 	long remaining_undos;   // Remaining number of undos
 
 public:
-	CostMap(const char *cm_filename, long rows, long cols, long lookahead);
+	CostMap(const char *cm_filename, long lookahead);
 	CostMap(CostMap *cm);
 
 	/**

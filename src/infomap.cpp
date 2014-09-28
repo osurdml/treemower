@@ -3,14 +3,14 @@
 #include <iostream>
 #include <iomanip>
 
-InfoMap::InfoMap(const char *score_fn, const char *depth_fn, const char *temperature_fn, const char *oxygen_fn, long rows, long cols, long num_lookahead)
+InfoMap::InfoMap(const char *score_fn, const char *depth_fn, const char *temperature_fn, const char *oxygen_fn, long num_lookahead)
 {
-	_size = ImportMatrix(0, &_visited, rows, cols, num_lookahead);
-	_size = ImportMatrix(score_fn, &_score, rows, cols, num_lookahead);
+	_size = ImportMatrix(score_fn, &_score, num_lookahead);
+	_size = ImportMatrix(0, &_visited, num_lookahead, _size.first, _size.second);
 
-	_size = ImportMatrix(depth_fn, &_depth, rows, cols);
-	_size = ImportMatrix(temperature_fn, &_temperature, rows, cols);
-	_size = ImportMatrix(oxygen_fn, &_oxygen, rows, cols);
+	_size = ImportMatrix(depth_fn, &_depth);
+	_size = ImportMatrix(temperature_fn, &_temperature);
+	_size = ImportMatrix(oxygen_fn, &_oxygen);
 }
 
 std::pair<long, long> InfoMap::size(void) const

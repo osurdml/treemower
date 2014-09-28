@@ -128,13 +128,11 @@ public:
 	 * @brief Constructor.
 	 *
 	 * @param im_filename Filename of CSV-formatted data to use as InfoMap.
-	 * @param im_rows Number of rows to parse.
-	 * @param im_rows Number of columns to parse.
 	 * @param num_lookahead Number of steps to look ahead before deciding on best branch.
 	 * @param budget Transport budget.
 	 * @param rand_frac Fraction of generated future states to follow through with during lookahead.
 	 */
-	DecisionTree(const char *im_filename, long im_rows, long im_cols, long num_lookahead, float budget, float rand_frac);
+	DecisionTree(const char *im_filename, long num_lookahead, float budget, float rand_frac);
 
 	/**
 	 * @brief Runs treemower.

@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-StuntzHuntz::StuntzHuntz(const char *im_filename, long rows, long cols, long lookahead, float budget, float rand_frac) :
-	DecisionTree(im_filename, rows, cols, lookahead, budget, rand_frac)
+StuntzHuntz::StuntzHuntz(const char *im_filename, long lookahead, float budget, float rand_frac) :
+	DecisionTree(im_filename, lookahead, budget, rand_frac)
 {
 }
 

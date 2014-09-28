@@ -13,8 +13,6 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, lon
 		return std::pair<long, long>(rows, cols);
 	}
 
-	(*m).resize(rows, cols);
-
 	// Open input file
 	std::ifstream mat_fs(mat_fn);
 	if (!mat_fs)
@@ -22,9 +20,20 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, lon
 		std::cerr << "Failed to open file " << mat_fn << std::endl;
 	}
 
-	// Read file
-	std::string line;
-	std::string field;
+	// Get map size
+	std::string line, field;
+	std::getline(mat_fs, line);
+	std::istringstream s(line);
+	std::string _rows, _cols;
+	std::getline(s, _rows, ',');
+	std::getline(s, _cols, ',');
+	rows = atol(_rows.c_str());
+	cols = atol(_cols.c_str());
+
+	printf("Got map size (%ld, %ld)\n", rows, cols);
+
+	// Get map data
+	(*m).resize(rows, cols);
 	for (int i=0; i<rows; i++) {
 		std::getline(mat_fs, line);
 		std::istringstream s(line);
@@ -38,7 +47,7 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, lon
 	return std::pair<long, long>(rows, cols);
 }
 
-std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long rows, long cols, long max_undo)
+std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long max_undo, long rows, long cols)
 {
 	this->max_undo = max_undo;   // TODO(yoos): This might have to go in the constructor.
 	undo_matrices.push_back(ms);   // Keep track so we can update in Step().
