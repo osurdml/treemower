@@ -1,36 +1,37 @@
 function exitcode = data2map(in_fn, out_fn)
+	MAPSCALE = 300000;   % Magic number
 	load(in_fn); % load the data, change the name pls.
 	format long;
 	radius = 100; % this could be change to different radius.
 	lon = Longitude(:);
 	lat = Latitude(:);
-	MapSize1 = max(lon(:)) - min(lon(:));
-	MapSize2 = max(lat(:)) - min(lat(:));
-	MapSize = max(MapSize1,MapSize2);
-	MapSize = round(abs(300000 * MapSize));
+	origin = [min(lon(:)), min(lat(:))]
 
-	while mod(MapSize,10) ~= 0
-		MapSize = MapSize + 1;
-	end
-	scoremap = ones(MapSize,MapSize);
+	% TODO(syoo): haversine
+	map_x = MAPSCALE * (max(lon(:)) - min(lon(:)));
+	map_y = MAPSCALE * (max(lat(:)) - min(lat(:)));
+	map = ones(map_x, map_y);
 
-
+	%matlabpool open 4;
 	for i = 1:length(lat)
-		x = round(300000 * (abs(lat(i) - min(lat(:))))) + 1;
-		y = round(300000 * (abs(lon(i) - min(lon(:))))) + 1;
-        for X = -radius:radius
-            for Y = -radius:radius
-                dist = sqrt(X^2 + Y^2);
-                if dist <= radius
-                    if x + X <= MapSize && x + X >= 1 && y + Y <= MapSize && y + Y >= 1
-                        scoremap(x+X,y+Y) = 0.5 * scoremap(x+X,y+Y);
-                    end
-                end
-            end
-        end    
+		fprintf('%d/%d\n', i, length(lat));
+		x = round(MAPSCALE * (lon(i) - origin(1))) + 1;
+		y = round(MAPSCALE * (lat(i) - origin(2))) + 1;
+		for dx = -radius:radius
+			for dy = -radius:radius
+				dist = sqrt(dx^2 + dy^2);
+				if dist <= radius
+					x_ = x + dx;
+					y_ = y + dy;
+					if x_ <= map_x && x_ >= 1 && y_ <= map_y && y_ >= 1
+						map(x_,y_) = 0.5 * map(x_,y_);
+					end
+				end
+			end
+		end    
 	end
 
 	%scoremap
 	%contour(scoremap);
 	%hold on;
-	csvwrite(out_fn,scoremap);
+	csvwrite(out_fn,map);
