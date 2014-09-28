@@ -226,18 +226,23 @@ void DecisionTree::Export(const char *out_filename)
 
 	// Metadata
 	ofs << "MapX,MapY,OriginX,OriginY\n";
-	ofs << im.size().first << ',' << im.size().second << ',' << im.origin().first << ',' << im.origin().second << "\n";
+	ofs << im.size().first << ',' << im.size().second << ',' << std::setprecision(20) << im.origin().first << ',' << im.origin().second << "\n";
 
 	// Data
-	ofs << "X,Y,Budget,Score\n";
-	ofs << UNIT_LENGTH*loc.x << ',' << UNIT_LENGTH*loc.y << ',' << budget << ',' << score << "\n";
+	// TODO(syoo): The 0.8045 is the only magic number here, calibrated to
+	// Durango, CO using some sample data. I need to actually use inverse
+	// haversine later.
+	float x_scale = UNIT_LENGTH/(0.8045*111111.1*cos(im.origin().first));
+	float y_scale = UNIT_LENGTH/111111.1;
+	ofs << "X,Y,Lat,Lon,Budget,Score\n";
+	ofs << loc.x << ',' << loc.y << ',' << std::setprecision(20) << im.origin().first+y_scale*loc.y << ',' << im.origin().second+x_scale*loc.x << ',' << std::setprecision(6) << budget << ',' << score << "\n";
 	while (boost::out_degree(print_vx, dTree) != 0) {
 		edge_t e = *boost::out_edges(print_vx, dTree).first;
 		print_vx = boost::target(e, dTree);
 		loc = dTree[print_vx].state.loc;
 		score = dTree[print_vx].state.score;
 		budget = dTree[print_vx].state.budget;
-		ofs << UNIT_LENGTH*loc.x << ',' << UNIT_LENGTH*loc.y << ',' << budget << ',' << score << "\n";
+		ofs << loc.x << ',' << loc.y << ',' << std::setprecision(20) << im.origin().first+y_scale*loc.y << ',' << im.origin().second+x_scale*loc.x << std::setprecision(6) << ',' << budget << ',' << score << "\n";
 	}
 
 	ofs.close();
