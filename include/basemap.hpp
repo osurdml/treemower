@@ -19,8 +19,8 @@ class BaseMap {
 	std::vector<std::vector<MatrixXf>*> undo_matrices;
 
 protected:
-	std::pair<long, long> ImportMatrix(const char *mat_fn, MatrixXf *m, long rows = 0, long cols = 0);
-	std::pair<long, long> ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long max_undo, long rows = 0, long cols = 0);
+	std::pair<long, long> ImportMatrix(const char *mat_fn, MatrixXf *m, long xsize = 0, long ysize = 0);
+	std::pair<long, long> ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long max_undo, long xsize = 0, long ysize = 0);
 
 	// Get/set
 	float MatrixGet(const MatrixXf *m, long x, long y) const;

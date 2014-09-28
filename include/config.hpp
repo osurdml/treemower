@@ -24,7 +24,8 @@ const long SAMPLE_INTERVAL = 5;
 // this times the square root of the step distance.
 const long BRANCH_FACTOR = 5;
 
-// Uncertainty reduction base factor, i.e., exactly at sample point
+// Uncertainty reduction base factor. Value will be decreased by this fraction
+// at sample point
 const float UNCERTAINTY_REDUCE_FACTOR = 0.5;
 
 // Exponential reduction factor. For a given radius away from the sample point,

@@ -5,7 +5,7 @@ function exitcode = plotpath(map_fn, path_fn)
 	% Get map dimensions from first row
 	map_x = map(1,1);
 	map_y = map(1,2);
-	map = map(2:end, :).';   % Transpose
+	map = map(2:end, :);
 	path = path(2:end, :);
 	x = path(:,1);
 	y = path(:,2);

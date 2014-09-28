@@ -6,11 +6,11 @@
 BaseMap::BaseMap(void)
 {}
 
-std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, long rows, long cols)
+std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, long xsize, long ysize)
 {
 	if (mat_fn == 0) {
-		(*m) = MatrixXf::Zero(rows, cols);
-		return std::pair<long, long>(rows, cols);
+		(*m) = MatrixXf::Zero(ysize, xsize);
+		return std::pair<long, long>(ysize, xsize);
 	}
 
 	// Open input file
@@ -24,28 +24,28 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, lon
 	std::string line, field;
 	std::getline(mat_fs, line);
 	std::istringstream s(line);
-	std::string _rows, _cols;
-	std::getline(s, _rows, ',');
-	std::getline(s, _cols, ',');
-	rows = atol(_rows.c_str());
-	cols = atol(_cols.c_str());
+	std::string _xsize, _ysize;
+	std::getline(s, _xsize, ',');
+	std::getline(s, _ysize, ',');
+	xsize = atol(_xsize.c_str());
+	ysize = atol(_ysize.c_str());
 
 	// Get map data
-	(*m).resize(rows, cols);
-	for (int i=0; i<rows; i++) {
+	(*m).resize(ysize, xsize);
+	for (int y=0; y<ysize; y++) {
 		std::getline(mat_fs, line);
 		std::istringstream s(line);
-		for (int j=0; j<cols; j++) {
+		for (int x=0; x<xsize; x++) {
 			std::getline(s, field,',');
-			(*m)(i, j) = std::atof(field.c_str());
+			(*m)(y, x) = std::atof(field.c_str());
 		}
 	}
 	mat_fs.close();
 
-	return std::pair<long, long>(rows, cols);
+	return std::pair<long, long>(xsize, ysize);
 }
 
-std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long max_undo, long rows, long cols)
+std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<MatrixXf> *ms, long max_undo, long xsize, long ysize)
 {
 	this->max_undo = max_undo;   // TODO(yoos): This might have to go in the constructor.
 	undo_matrices.push_back(ms);   // Keep track so we can update in Step().
@@ -53,7 +53,7 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<Matr
 
 	// Import into temporary matrix.
 	MatrixXf m;
-	ret_size = ImportMatrix(mat_fn, &m, rows, cols);
+	ret_size = ImportMatrix(mat_fn, &m, xsize, ysize);
 
 	// Set up undo buffer.
 	for (int i=0; i<max_undo+1; i++) {
@@ -67,35 +67,35 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, std::vector<Matr
 
 float BaseMap::MatrixGet(const MatrixXf *m, long x, long y) const
 {
-	if (x < 0 || y < 0 || x > m->rows()-1 || y > m->cols()-1) {
+	if (x < 0 || y < 0 || x > m->cols()-1 || y > m->rows()-1) {
 		return -1;
 	}
-	return (*m)(x, y);
+	return (*m)(y, x);
 }
 
 float BaseMap::MatrixGet(const std::vector<MatrixXf> *m, long x, long y) const
 {
-	if (x < 0 || y < 0 || x > (*m)[idx_undo].rows()-1 || y > (*m)[idx_undo].cols()-1) {
+	if (x < 0 || y < 0 || x > (*m)[idx_undo].cols()-1 || y > (*m)[idx_undo].rows()-1) {
 		return -1;
 	}
-	return (*m)[idx_undo](x, y);
+	return (*m)[idx_undo](y, x);
 }
 
 int BaseMap::MatrixSet(MatrixXf *m, long x, long y, float val)
 {
-	if (x < 0 || y < 0 || x > m->rows()-1 || y > m->cols()-1) {
+	if (x < 0 || y < 0 || x > m->cols()-1 || y > m->rows()-1) {
 		return -1;
 	}
-	(*m)(x, y) = val;
+	(*m)(y, x) = val;
 	return 0;
 }
 
 int BaseMap::MatrixSet(std::vector<MatrixXf> *m, long x, long y, float val)
 {
-	if (x < 0 || y < 0 || x > (*m)[idx_undo].rows()-1 || y > (*m)[idx_undo].cols()-1) {
+	if (x < 0 || y < 0 || x > (*m)[idx_undo].cols()-1 || y > (*m)[idx_undo].rows()-1) {
 		return -1;
 	}
-	(*m)[idx_undo](x, y) = val;
+	(*m)[idx_undo](y, x) = val;
 	return 0;
 }
 
