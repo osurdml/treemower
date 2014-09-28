@@ -1,7 +1,7 @@
 function exitcode = data2map(in_fn, out_fn)
 	load(in_fn); % load the data, change the name pls.
 	format long;
-	radius = 3; % this could be change to different radius.
+	radius = 100; % this could be change to different radius.
 	lon = Longitude(:);
 	lat = Latitude(:);
 	MapSize1 = max(lon(:)) - min(lon(:));
@@ -18,25 +18,16 @@ function exitcode = data2map(in_fn, out_fn)
 	for i = 1:length(lat)
 		x = round(300000 * (abs(lat(i) - min(lat(:))))) + 1;
 		y = round(300000 * (abs(lon(i) - min(lon(:))))) + 1;
-		if x + 1 >MapSize
-			x = MapSize;
-		end
-		if y + 1 > MapSize
-			y = MapSize;
-		end
-		scoremap(x,y) = 0.5 * scoremap(x,y);
-		if x + radius <= MapSize
-			scoremap(x+1,y) = 0.5 * scoremap(x+1,y);
-		end
-		if x - radius >= 1
-			scoremap(x-1,y) = 0.5 * scoremap(x-1,y);
-		end
-		if y - radius >= 1
-			scoremap(x, y-1) = 0.5 * scoremap(x, y-1);
-		end
-		if y + radius <= MapSize
-			scoremap(x, y+1) = 0.5 * scoremap(x, y+1);
-		end
+        for X = -radius:radius
+            for Y = -radius:radius
+                dist = sqrt(X^2 + Y^2);
+                if dist <= radius
+                    if x + X <= MapSize && x + X >= 1 && y + Y <= MapSize && y + Y >= 1
+                        scoremap(x+X,y+Y) = 0.5 * scoremap(x+X,y+Y);
+                    end
+                end
+            end
+        end    
 	end
 
 	%scoremap
