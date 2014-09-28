@@ -30,8 +30,6 @@ std::pair<long, long> BaseMap::ImportMatrix(const char *mat_fn, MatrixXf *m, lon
 	rows = atol(_rows.c_str());
 	cols = atol(_cols.c_str());
 
-	printf("Got map size (%ld, %ld)\n", rows, cols);
-
 	// Get map data
 	(*m).resize(rows, cols);
 	for (int i=0; i<rows; i++) {
