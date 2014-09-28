@@ -1,5 +1,5 @@
 function exitcode = data2map(in_fn, out_fn)
-	UNIT_LENGTH = 4;   % Distance in meters per map unit.
+	UNIT_LENGTH = 0.5;   % Distance in meters per map unit.
 	SAMPLE_RADIUS = 30;   % Radius of sample area in map units.
 
 	% Fetch data
@@ -10,13 +10,14 @@ function exitcode = data2map(in_fn, out_fn)
 	lat = Latitude(:);
 
 	% Calculate some dimensions
-	fprintf('Calculating dimensions\n');
+	fprintf('Calculating dimensions: ');
 	origin = [min(lat), min(lon)];
 	nigiro = [max(lat), max(lon)];   % Corner opposite origin
-	map_x = 1000 * haversine([origin(1), nigiro(2)], origin);   % Using origin lat
-	map_y = 1000 * haversine([nigiro(1), origin(2)], origin);   % Using origin lon
-	x_scale = map_x / UNIT_LENGTH / (nigiro(2)-origin(2));
-	y_scale = map_y / UNIT_LENGTH / (nigiro(1)-origin(1));
+	map_x = 1000 * haversine([origin(1), nigiro(2)], origin) / UNIT_LENGTH;   % Map X unit length
+	map_y = 1000 * haversine([nigiro(1), origin(2)], origin) / UNIT_LENGTH;   % Map Y unit length
+	x_scale = map_x / (nigiro(2)-origin(2));
+	y_scale = map_y / (nigiro(1)-origin(1));
+	fprintf('%d, %d\n', map_x, map_y);
 
 	% Build map
 	fprintf('Building map\n');
