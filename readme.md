@@ -26,15 +26,15 @@ Generate paths
 Once you have a map, run treemower as follows to generate a path:
 
 ```
-./treemower <CSV costmap> <rh | lm> <lookahead> <budget> <random choice fraction> <output filename>
+./treemower <CSV costmap> <rh | lm> <budget> <lookahead> <random choice fraction> <uncertainty threshold> <output filename>
 ```
 
 For example, to use the receding horizon path planner on `data/lake.map` with
-3-step lookahead and 5000 units (explained below) of travel budget, your
-command might look something like this:
+3-step lookahead and 5000 units (explained below) of travel budget to reduce
+uncertainty to 20%, your command might look something like this:
 
 ```
-./treemower data/lake.map rh 3 5000 1.0 output/lake.path
+./treemower data/lake.map rh 5000 3 1.0 0.2 output/lake.path
 ```
 
 1 unit of the travel budget corresponds to 1 tick or cell in the map that is
