@@ -43,8 +43,10 @@ def args2csv(arglist):
             + str(arglist['frac'])
 
 def run(mp_args):
+    score = 0
     cmd = args2cmd(mp_args)
-    score = os.popen(cmd).read()
+    if not os.path.isfile(args2fn(mp_args)):
+        score = os.popen(cmd).read()
 
     # Print progress
     with mp_lock:
@@ -59,6 +61,10 @@ p_list = []
 for sm in scoremaps:
     for bu in budgets:
         for alg in algorithms:
+            if alg == 'lm':
+                arglist = {'sm': sm, 'alg': alg, 'budget': bu, 'la': 1, 'frac': 1.0, 'thres': 0}
+                p_list.append(arglist.copy())
+                continue
             for la in lookaheads:
                 for f in rand_fracs:
                     for th in thresholds:
