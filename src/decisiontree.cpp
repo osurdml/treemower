@@ -188,7 +188,14 @@ float DecisionTree::Mow(void)
 {
 	// Hack to detect infinite loop
 	float last_score = -1;
-	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL && dTree[current_vx].state.score != last_score) {
+	long hang_counter = 100;
+	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL && hang_counter > 0) {
+		if (dTree[current_vx].state.score == last_score) {
+			hang_counter -= 1;
+		}
+		else {
+			hang_counter = 100;
+		}
 		last_score = dTree[current_vx].state.score;
 
 		// DEBUG
