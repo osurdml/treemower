@@ -62,7 +62,7 @@ for sm in scoremaps:
             for la in lookaheads:
                 for f in rand_fracs:
                     for th in thresholds:
-                        arglist = {'sm': sm, 'budget': bu, 'alg': alg, 'la': la, 'frac': f, 'thres': th}
+                        arglist = {'sm': sm, 'alg': alg, 'budget': bu, 'la': la, 'frac': f, 'thres': th}
                         p_list.append(arglist.copy())
 
 # Run algorithms
