@@ -186,7 +186,11 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 
 float DecisionTree::Mow(void)
 {
-	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL) {
+	// Hack to detect infinite loop
+	float last_score = -1;
+	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL && dTree[current_vx].state.score != last_score) {
+		last_score = dTree[current_vx].state.score;
+
 		// DEBUG
 		if (PRINT_DEBUG) {
 			std::cout << std::setw(8) << dTree[current_vx].state.budget;
