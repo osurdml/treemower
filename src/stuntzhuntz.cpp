@@ -52,7 +52,7 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 
 		// Keep states that exceed a threshold.
 		for (std::vector<state_t>::iterator it=maybe_states.begin(); it!=maybe_states.end(); it++) {
-			if (im.score(it->loc.x, it->loc.y, SAMPLE_RADIUS) > UNCERTAINTY_THRESHOLD) {
+			if (im.score(it->loc.x, it->loc.y, SAMPLE_RADIUS) >= UNCERTAINTY_THRESHOLD) {
 				states->push_back(*it);
 			}
 		}

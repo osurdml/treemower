@@ -5,40 +5,41 @@ import sys
 import os
 import multiprocessing
 
-RESULT_FN = sys.argv[1]
-
 # Setup
-DATA_DIR = 'data'
-OUTPUT_DIR = 'output'
+DATA_DIR = 'final/maps'
+OUTPUT_DIR = 'final/paths'
 NUM_PROC = 10
 
 # Stuff to permutate
-budgets    = [1000, 2000, 3000, 4000, 5000]
-scoremaps  = ['500x500_test'] #'costmap2']
+scoremaps  = ['500x500_'+str(s)+'_'+str(n) for s in range(5,31,5) for n in range(5,51,5)]
+budgets    = [25000]
 algorithms = ['lm', 'rh']
-lookaheads = [2, 3, 4, 5]
-rand_fracs = [1.00]#[0.25, 0.50, 0.75, 1.00]
+lookaheads = [2]
+rand_fracs = [0.2, 0.4, 0.6, 0.8, 1.0]
+thresholds = [0.0, 0.05, 0.10, 0.15, 0.20, 0.25]
 
 def args2fn(arglist):
-    return OUTPUT_DIR + "/" + arglist['sm'] + "_" \
-            + arglist['alg'] + "_" \
-            + str(arglist['la']) + "_" \
-            + str(arglist['budget']) + "_" \
-            + str(arglist['frac']) + ".path"
+    return OUTPUT_DIR + "/" + arglist['sm'] \
+             + "_" + arglist['alg'] \
+             + "_b" + str(arglist['budget']) \
+             + "_la" + str(arglist['la']) \
+             + "_rf" + str(arglist['frac']) \
+             + "_th" + str(arglist['thres']) + ".path"
 
 def args2cmd(arglist):
     return './treemower ' \
-            + DATA_DIR + "/" + arglist['sm'] + ".map " \
-            + arglist['alg'] + " " \
-            + str(arglist['la']) + " " \
-            + str(arglist['budget']) + " " \
-            + str(arglist['frac']) + " " \
-            + args2fn(arglist)
+            + DATA_DIR + "/" + arglist['sm'] + ".map" \
+            + " " + arglist['alg'] \
+            + " " + str(arglist['budget']) \
+            + " " + str(arglist['la']) \
+            + " " + str(arglist['frac']) \
+            + " " + str(arglist['thres']) \
+            + " " + args2fn(arglist)
 
 def args2csv(arglist):
     return arglist['sm'] + ', ' \
-            + str(arglist['la']) + ', ' \
             + str(arglist['budget']) + ', ' \
+            + str(arglist['la']) + ', ' \
             + str(arglist['frac'])
 
 def run(mp_args):
@@ -56,22 +57,13 @@ def run(mp_args):
 # Permute arguments
 p_list = []
 for sm in scoremaps:
-    for la in lookaheads:
-	for bu in budgets:
-            for f in rand_fracs:
-                arglist = {'sm': sm, 'la': la, 'budget': bu, 'frac': 1.00}
-                for alg in algorithms:
-                    arglist['alg'] = alg
-                    p_list.append(arglist.copy())
-
-# Open results file.
-res_f = open(RESULT_FN, 'wb')
-
-# Write header
-header = "Map, Lookahead, Budget, Random fraction"
-for alg in algorithms:
-    header += ', ' + alg
-print(header, file=res_f)
+    for bu in budgets:
+        for alg in algorithms:
+            for la in lookaheads:
+                for f in rand_fracs:
+                    for th in thresholds:
+                        arglist = {'sm': sm, 'budget': bu, 'alg': alg, 'la': la, 'frac': f, 'thres': th}
+                        p_list.append(arglist.copy())
 
 # Run algorithms
 mp_lock = multiprocessing.Lock()
@@ -80,20 +72,4 @@ mp = multiprocessing.Pool(NUM_PROC)
 mp_results = mp.map(run, p_list)
 mp.close()
 mp.join()
-
-# Write results
-res_idx = 0
-for sm in scoremaps:
-    for la in lookaheads:
-	for bu in budgets:
-            for f in rand_fracs:
-                arglist = {'sm': sm, 'la': la, 'budget': bu, 'frac': 1.00}
-                res_f.write(args2csv(arglist))
-                for alg in algorithms:
-                    res_f.write(', '+mp_results[res_idx])
-                    res_idx += 1
-                res_f.write('\n')
-
-# Close results file.
-res_f.close()
 

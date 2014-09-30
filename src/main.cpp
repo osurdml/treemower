@@ -8,8 +8,8 @@
 
 int main(int argc, char **argv)
 {
-	if (argc < 7) {
-		std::cout << "Usage: " << argv[0] << " <CSV costmap> <rh | lm> <lookahead> <budget> <random choice fraction> <output filename>" << std::endl;
+	if (argc < 8) {
+		std::cout << "Usage: " << argv[0] << " <CSV costmap> <rh | lm> <budget> <lookahead> <random choice fraction> <uncertainty threshold> <output filename>" << std::endl;
 
 		return 1;
 	}
@@ -20,13 +20,12 @@ int main(int argc, char **argv)
 	START_X = 0;
 	START_Y = 0;
 	const char *cm_filename = argv[1];
-
-	LOOKAHEAD = atol(argv[3]);
-	BUDGET = atol(argv[4]);
-	RAND_FRAC = atof(argv[5]);
-
 	std::string alg = argv[2];
-	std::string out_fn = argv[6];
+	BUDGET = atol(argv[3]);
+	LOOKAHEAD = atol(argv[4]);
+	RAND_FRAC = atof(argv[5]);
+	UNCERTAINTY_THRESHOLD = atof(argv[6]);
+	std::string out_fn = argv[7];
 
 	DecisionTree *dt;
 	if (alg == "rh") {

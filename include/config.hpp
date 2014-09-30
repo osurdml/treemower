@@ -8,9 +8,12 @@ extern long START_X;
 extern long START_Y;
 
 // Algorithm parameters (these will probably be permutated a lot via an external script
-extern long LOOKAHEAD;
 extern long BUDGET;
+extern long LOOKAHEAD;
 extern float RAND_FRAC;
+
+// Uncertainty below this is "good enough."
+extern float UNCERTAINTY_THRESHOLD;
 
 // THE FOLLOWING SHOULD PROBABLY STAY CONSTANT, AS THEY DEPEND ON BOAT CONFIG
 
@@ -18,10 +21,10 @@ extern float RAND_FRAC;
 const float UNIT_LENGTH = 0.5;
 
 // Sample radius.
-const long SAMPLE_RADIUS = 30;
+const long SAMPLE_RADIUS = 6;
 
 // Number of cells between sample points.
-const long SAMPLE_INTERVAL = 50;
+const long SAMPLE_INTERVAL = 10;
 
 // Somewhat of a magic number. The number of branches generated is equal to
 // this times the square root of the step distance.
@@ -35,9 +38,6 @@ const float UNCERTAINTY_REDUCE_FACTOR = 0.5;
 // the uncertainty reduction factor above will be multiplied by this factor
 // floor(radius) times.
 const float UNCERTAINTY_REDUCE_EXP = 1.0;
-
-// Uncertainty below this is "good enough."
-const float UNCERTAINTY_THRESHOLD = 0.2;
 
 #endif // CONFIG_HPP
 
