@@ -187,16 +187,10 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 float DecisionTree::Mow(void)
 {
 	// Hack to detect infinite loop
-	float last_score = -1;
-	long hang_counter = 10000;
-	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL && hang_counter > 0) {
-		if (dTree[current_vx].state.score == last_score) {
-			hang_counter -= 1;
-		}
-		else {
-			hang_counter = 10000;
-		}
-		last_score = dTree[current_vx].state.score;
+	// TODO(syoo): Implement equality checker for location_t.
+	location_t last_loc = {-1,-1};
+	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL && !(dTree[current_vx].state.loc.x == last_loc.x && dTree[current_vx].state.loc.y == last_loc.y)) {
+		last_loc = dTree[current_vx].state.loc;
 
 		// DEBUG
 		if (PRINT_DEBUG) {
