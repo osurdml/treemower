@@ -27,6 +27,7 @@ function exitcode = animpath(map_fn, path_fn)
 		plot3([px1 px2], [py1 py2], [map(py1, px1) map(py2, px2)], 'Color','b','LineWidth',1,'Marker','.');
 		pause(0.001)
 	end
+	axis equal;
 
 	exitcode = 0;
 end
