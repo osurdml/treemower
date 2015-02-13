@@ -192,15 +192,16 @@ float DecisionTree::Mow(void)
 	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL && !(dTree[current_vx].state.loc.x == last_loc.x && dTree[current_vx].state.loc.y == last_loc.y)) {
 		last_loc = dTree[current_vx].state.loc;
 
-		// DEBUG
-		if (PRINT_DEBUG) {
-			std::cout << std::setw(8) << dTree[current_vx].state.budget;
-			std::cout << "\n";
-		}
-
 		LookAhead(current_vx, num_lookahead);
 		state_t target_state = dTree[FindBest(current_vx)].state;   // Some location way out there.
 		Prune(current_vx, 0);   // Prune all branches
+
+		// DEBUG
+		if (PRINT_DEBUG) {
+			std::cout << last_loc.x << "," << last_loc.y << "  ";
+			std::cout << std::setw(8) << dTree[current_vx].state.budget;
+			std::cout << "\n";
+		}
 
 		// Step costmap forward.
 		im.Step(1);
