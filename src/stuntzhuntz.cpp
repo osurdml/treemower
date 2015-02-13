@@ -44,10 +44,9 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 	//step_dist = fmax(fmin(5/im.score(x,y,SAMPLE_RADIUS), 400), SAMPLE_INTERVAL);
 	//branch_num = BRANCH_FACTOR * sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
 
-	std::vector<state_t> maybe_states;   // Temporary states to examine
-	do {
+	while (true) {
 		// Generate future states by distance and angle.
-		maybe_states.clear();
+		std::vector<state_t> maybe_states;   // Temporary states to examine
 		AddDecisions(state, step_dist, branch_num, &maybe_states);
 
 		// Keep states that exceed a threshold.
@@ -59,13 +58,24 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 
 		// Increase step_dist to try and find better pasture.
 		step_dist += SAMPLE_INTERVAL;
-		branch_num = BRANCH_FACTOR*sqrt(step_dist);
-	} while (states->size() == 0 && maybe_states.size() != 0 && step_dist <= state->budget);
 
-	// Wander?
+		// Scale branch number with square root of step_dist. Scaling linearly
+		// costs too much time.
+		branch_num = BRANCH_FACTOR*sqrt(step_dist);
+
+		// Loop as long as we:
+		//   1. Are still generating possible states
+		//   2. But can't find any final states
+		//   3. And have fuel left
+		if (!(states->size() == 0 && maybe_states.size() != 0 && step_dist <= state->budget)) {
+			break;
+		}
+	}
+
+	// Wander if we can't find qualifying states. I.e., work with what we've got.
 	if (states->size() == 0) {
-		step_dist = fmin(rand() % 500, state->budget);
-		branch_num = BRANCH_FACTOR*sqrt(step_dist);   // Scale with square root of step_dist. Scaling linearly costs too much time.
+		step_dist = fmin(rand() % 500, state->budget);   // Flail around to some random distance.
+		branch_num = BRANCH_FACTOR*sqrt(step_dist);
 		AddDecisions(state, step_dist, branch_num, states);
 	}
 
@@ -77,9 +87,11 @@ long StuntzHuntz::Explore(state_t *state, std::vector<state_t> *states)
 
 vx_t StuntzHuntz::FindBest(vx_t source_vx)
 {
+	// Base case: no children, return self.
 	vx_t best_vx = source_vx;
 	float best_score = dTree[source_vx].state.score;
 
+	// If children: find best (immediate) child
 	if (boost::out_degree(source_vx, dTree) > 0) {
 		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, dTree);
 		for(; edges.first != edges.second; edges.first++) {
@@ -87,8 +99,8 @@ vx_t StuntzHuntz::FindBest(vx_t source_vx)
 			float child_score = dTree[FindBest(child_vx)].state.score;
 
 			if (child_score > best_score) {
-				best_vx = child_vx;
-				best_score = child_score;
+				best_vx = child_vx;   // Score of child with best child score (not necessarily its own score)
+				best_score = child_score;   // Score of child with best score
 			}
 		}
 	}
