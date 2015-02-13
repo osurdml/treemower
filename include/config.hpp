@@ -21,10 +21,10 @@ extern float UNCERTAINTY_THRESHOLD;
 const float UNIT_LENGTH = 0.5;
 
 // Sample radius.
-const long SAMPLE_RADIUS = 6;
+const long SAMPLE_RADIUS = 3;
 
 // Number of cells between sample points.
-const long SAMPLE_INTERVAL = 10;
+const long SAMPLE_INTERVAL = 5;
 
 // Somewhat of a magic number. The number of branches generated is equal to
 // this times the square root of the step distance.
