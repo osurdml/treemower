@@ -17,7 +17,7 @@ function exitcode = plotpath(map_fn, path_fn)
 	title(map_fn)
 	xlabel('X');
 	ylabel('Y');
-	line(x,y,'Color','b','LineWidth',1,'Marker','.');
+	line(x,y,'Color','b','LineWidth',3,'Marker','.');
 	axis equal;
 
 	exitcode = 0;
