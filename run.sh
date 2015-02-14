@@ -1,5 +1,5 @@
 #!/bin/bash
 
-./treemower data/500x500_test.map rh 3 6000 1.0 output/rh.out
+./treemower data/500x500_sparse.map rh 500 2 1.0 0.2 output/rh.out
 exit 0
 
