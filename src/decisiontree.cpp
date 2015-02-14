@@ -21,7 +21,6 @@ DecisionTree::DecisionTree(const char *im_filename, long num_lookahead, float bu
 	dTree[root_vx].state.loc.y = START_Y;
 	dTree[root_vx].state.score = 0;
 	dTree[root_vx].state.budget = budget;
-	current_vx = root_vx;
 }
 
 long DecisionTree::LookAhead(vx_t source_vx, long depth)
@@ -168,7 +167,8 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 		// Add new stuff to graph.
 		boost::add_edge(parent_vx, new_vx, dTree);
 		dTree[new_vx].parent = parent_vx;
-		dTree[new_vx].state = (state_t) {{src_x,src_y}, CalcScore(&dTree[parent_vx].state), dTree[parent_vx].state.budget-dist/num_steps};
+		dTree[new_vx].state = (state_t) {{src_x,src_y}, dTree[parent_vx].state.score, dTree[parent_vx].state.budget-dist/num_steps};
+		dTree[new_vx].state.score = CalcScore(&dTree[new_vx].state);   // Update score after rest of state is initialized. Ugh.
 
 		// The following is to do whatever the explorer normally does to update
 		// the state. Of course, it unnecessarily generates new states, so
@@ -186,20 +186,27 @@ vx_t DecisionTree::SampleToTarget(vx_t source_vx, state_t target_state)
 
 float DecisionTree::Mow(void)
 {
-	// Hack to detect infinite loop
+	// Take first step.
+	dTree[root_vx].state.score = CalcScore(&dTree[root_vx].state);
+	std::vector<state_t> fs;
+	Explore(&dTree[root_vx].state, &fs);
+	Prune(root_vx, 0);
+	current_vx = root_vx;
+
 	// TODO(syoo): Implement equality checker for location_t.
 	location_t last_loc = {-1,-1};
 	while (dTree[current_vx].state.budget >= SAMPLE_INTERVAL && !(dTree[current_vx].state.loc.x == last_loc.x && dTree[current_vx].state.loc.y == last_loc.y)) {
 		last_loc = dTree[current_vx].state.loc;
 
+		// Generate possible future states, choose a target, and reset.
 		LookAhead(current_vx, num_lookahead);
 		state_t target_state = dTree[FindBest(current_vx)].state;   // Some location way out there.
 		Prune(current_vx, 0);   // Prune all branches
 
 		// DEBUG
 		if (PRINT_DEBUG) {
-			std::cout << last_loc.x << "," << last_loc.y << "  ";
-			std::cout << std::setw(8) << dTree[current_vx].state.budget;
+			std::cout << last_loc.x << "," << last_loc.y << "  ";   // Coordinates
+			std::cout << std::setw(8) << dTree[current_vx].state.budget;   // Remaining transport budget
 			std::cout << "\n";
 		}
 

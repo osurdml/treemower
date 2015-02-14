@@ -95,15 +95,18 @@ vx_t StuntzHuntz::FindBest(vx_t source_vx)
 	if (boost::out_degree(source_vx, dTree) > 0) {
 		std::pair<edge_iter, edge_iter> edges = boost::out_edges(source_vx, dTree);
 		for(; edges.first != edges.second; edges.first++) {
-			vx_t child_vx = boost::target(*edges.first, dTree);
-			float child_score = dTree[FindBest(child_vx)].state.score;
+			vx_t child_vx = boost::target(*edges.first, dTree);   // Score of child with best child score (not necessarily its own score)
+			float child_score = dTree[FindBest(child_vx)].state.score;   // Score of child with best score
+			dTree[child_vx].state.score = child_score;   // Propagate best score back up towards parent node. This is a hack, but it's okay because we regenerate this particular child when we make this move for real.
 
 			if (child_score > best_score) {
-				best_vx = child_vx;   // Score of child with best child score (not necessarily its own score)
-				best_score = child_score;   // Score of child with best score
+				best_vx = child_vx;
+				best_score = child_score;
 			}
 		}
 	}
+
+	//std::cout << dTree[source_vx].state.loc.x << "," << dTree[source_vx].state.loc.y << "  " << best_score << std::endl;
 
 	return best_vx;
 }
